@@ -2,11 +2,9 @@ FROM microsoft/dotnet:latest
 
 WORKDIR /app
 
-COPY project.json .
+COPY . /app
 
 RUN ["dotnet", "restore"]
-
-COPY . /app
 
 RUN ["dotnet", "build"]
 
