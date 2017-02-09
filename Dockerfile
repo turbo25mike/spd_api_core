@@ -1,10 +1,12 @@
 FROM microsoft/dotnet:latest
 
-COPY . /app
-
 WORKDIR /app
 
+COPY project.json .
+
 RUN ["dotnet", "restore"]
+
+COPY . /app
 
 RUN ["dotnet", "build"]
 
