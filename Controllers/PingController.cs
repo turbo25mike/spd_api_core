@@ -49,6 +49,7 @@ namespace WebAPIApplication.Controllers
             return Environment.GetEnvironmentVariable("APP_ENVIRONMENT") ?? "Development";
         }
         
+        [Authorize]
         [HttpGet]
         [Route("status/secure")]
         public object GetSecured()
