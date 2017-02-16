@@ -2,12 +2,20 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace WebAPIApplication.Controllers
 {
     [Route("api")]
     public class PingController : Controller
     {
+        private IMemoryCache _cache;
+
+        public PingController(IMemoryCache cache)
+        {
+            _cache = cache;
+        }
+
         [HttpGet]
         [Route("ping")]
         public string Ping()
@@ -62,14 +70,16 @@ namespace WebAPIApplication.Controllers
         [Route("auth")]
         public void GetAuth(string code, string state)
         {
-            HttpContext.Session.SetString(state.TrimEnd('#'), code);
+            _cache.Set(state.TrimEnd('#'), code, new TimeSpan(0, 0, 0, 20));
         }
         
         [HttpGet]
         [Route("auth/{state}/code")]
         public string GetAuthCode(string state)
         {
-            return HttpContext.Session.GetString(state);
+            return _cache.Get<string>(state);
         }
+
+
     }
 }
