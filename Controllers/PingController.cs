@@ -77,7 +77,10 @@ namespace WebAPIApplication.Controllers
         [Route("auth/{state}/code")]
         public string GetAuthCode(string state)
         {
-            return _cache.Get<string>(state);
+            var result = _cache.Get<string>(state);
+            if (!string.IsNullOrEmpty(result))
+                return result;
+            throw new ArgumentNullException();
         }
 
 
