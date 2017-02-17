@@ -44,12 +44,11 @@ namespace WebAPIApplication
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            var options = new JwtBearerOptions
-            {
-                Audience = Environment.GetEnvironmentVariable("AUTH0_CLIENT_IDS") ?? Configuration["Auth0:ApiIdentifier"],
-                Authority = Environment.GetEnvironmentVariable("AUTH0_DOMAIN") ?? Configuration["Auth0:Domain"]
-            };
-            app.UseJwtBearerAuthentication(options);
+            var clientIDs = Environment.GetEnvironmentVariable("AUTH0_CLIENT_IDS") ?? Configuration["Auth0:ApiIdentifier"];
+            var domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN") ?? Configuration["Auth0:Domain"];
+
+            foreach (var id in clientIDs.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                app.UseJwtBearerAuthentication(new JwtBearerOptions { Audience = id, Authority = domain });
 
             app.UseMvc();
         }
