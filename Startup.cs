@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -45,8 +46,8 @@ namespace WebAPIApplication
 
             var options = new JwtBearerOptions
             {
-                Audience = Configuration["Auth0:ApiIdentifier"],
-                Authority = $"https://{Configuration["Auth0:Domain"]}/"
+                Audience = Environment.GetEnvironmentVariable("AUTH0_CLIENT_IDS") ?? Configuration["Auth0:ApiIdentifier"],
+                Authority = Environment.GetEnvironmentVariable("AUTH0_DOMAIN") ?? Configuration["Auth0:Domain"]
             };
             app.UseJwtBearerAuthentication(options);
 
