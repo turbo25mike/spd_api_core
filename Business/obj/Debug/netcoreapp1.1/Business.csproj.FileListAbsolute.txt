@@ -1,8 +1,0 @@
-C:\Development\GitHub\spd_api_core\Business\bin\Debug\netcoreapp1.1\Microsoft.DiaSymReader.Native.x86.dll
-C:\Development\GitHub\spd_api_core\Business\bin\Debug\netcoreapp1.1\Microsoft.DiaSymReader.Native.amd64.dll
-C:\Development\GitHub\spd_api_core\Business\bin\Debug\netcoreapp1.1\Business.deps.json
-C:\Development\GitHub\spd_api_core\Business\bin\Debug\netcoreapp1.1\Business.dll
-C:\Development\GitHub\spd_api_core\Business\bin\Debug\netcoreapp1.1\Business.pdb
-C:\Development\GitHub\spd_api_core\Business\obj\Debug\netcoreapp1.1\Business.AssemblyInfo.cs
-C:\Development\GitHub\spd_api_core\Business\obj\Debug\netcoreapp1.1\Business.dll
-C:\Development\GitHub\spd_api_core\Business\obj\Debug\netcoreapp1.1\Business.pdb
