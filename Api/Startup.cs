@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Api.Models;
 
 namespace Api
 {
@@ -24,6 +25,9 @@ namespace Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ConfigureAppSettings(services);
+
+
             // Add service and create Policy with options
             services.AddCors(options =>
             {
@@ -37,13 +41,18 @@ namespace Api
             services.AddMvc();
         }
 
+        private void ConfigureAppSettings(IServiceCollection services)
+        {
+            services.AddSingleton<IAppSettings>(new AppSettings
+            {
+                DB_Connection = Environment.GetEnvironmentVariable("APP_DB_CONNECTION") ?? Configuration["App:DB_Connection"]
+            });
+        }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-
-
-
             app.UseCors("CorsPolicy");
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -57,7 +66,8 @@ namespace Api
                     Audience = id,
                     Authority = domain
 #if DEBUG
-                    ,RequireHttpsMetadata = false
+                    ,
+                    RequireHttpsMetadata = false
 #endif
                 });
 

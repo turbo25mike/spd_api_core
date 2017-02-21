@@ -2,12 +2,20 @@ using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Api.DataContext;
+using Api.Models;
 
 namespace Api.Controllers
 {
     [Route("api/status")]
     public class StatusController : Controller
     {
+        private readonly IAppSettings _settings;
+
+        public StatusController(IAppSettings settings)
+        {
+            _settings = settings;
+        }
+
         [HttpGet]
         [Route("")]
         public string Get()
@@ -43,7 +51,7 @@ namespace Api.Controllers
         [Route("db")]
         public string GetDBStatus()
         {
-            MemberContext.GetAdmin();
+            new MemberContext(_settings).GetAdmin();
             return "Looking Good!";
         }
     }
