@@ -16,10 +16,10 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "WebAPIApplication": {
+    "Api": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:5000/api/ping",
+      "launchUrl": "http://localhost:5000/api/status",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

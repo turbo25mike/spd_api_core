@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace WebAPIApplication
+namespace Api
 {
     public class Startup
     {
@@ -37,9 +37,13 @@ namespace WebAPIApplication
             services.AddMvc();
         }
 
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+
+
+
             app.UseCors("CorsPolicy");
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -48,7 +52,14 @@ namespace WebAPIApplication
             var domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN") ?? Configuration["Auth0:Domain"];
 
             foreach (var id in clientIDs.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                app.UseJwtBearerAuthentication(new JwtBearerOptions { Audience = id, Authority = domain });
+                app.UseJwtBearerAuthentication(new JwtBearerOptions
+                {
+                    Audience = id,
+                    Authority = domain
+#if DEBUG
+                    ,RequireHttpsMetadata = false
+#endif
+                });
 
             app.UseMvc();
         }

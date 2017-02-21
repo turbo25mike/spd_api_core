@@ -2,9 +2,9 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace WebAPIApplication.Controllers
+namespace Api.Controllers
 {
-    [Route("api")]
+    [Route("api/auth")]
     public class AuthController : Controller
     {
         private IMemoryCache _cache;
@@ -15,14 +15,14 @@ namespace WebAPIApplication.Controllers
         }
 
         [HttpGet]
-        [Route("auth")]
+        [Route("")]
         public void GetAuth(string code, string state)
         {
             _cache.Set(state.TrimEnd('#'), code, new TimeSpan(0, 0, 0, 20));
         }
         
         [HttpGet]
-        [Route("auth/{state}/code")]
+        [Route("{state}/code")]
         public string GetAuthCode(string state)
         {
             var result = _cache.Get<string>(state);
