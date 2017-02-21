@@ -16,7 +16,8 @@
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.1.0",
     "Microsoft.AspNetCore.Authentication.JwtBearer": "1.1.0-*",
     "Microsoft.AspNetCore.Mvc": "1.1.1",
-    "Microsoft.AspNetCore.Session": "1.0.0"
+    "Microsoft.AspNetCore.Session": "1.0.0",
+    "MySql.Data": "7.0.6-ir31"
   },
 
   "tools": {

@@ -1,9 +1,7 @@
 FROM microsoft/dotnet:latest
-WORKDIR /app
+WORKDIR /app/Api
 COPY . /app
 RUN ["dotnet", "restore"]
-
-WORKDIR /app/Api
 RUN ["dotnet", "build"]
 
 EXPOSE 5000/tcp

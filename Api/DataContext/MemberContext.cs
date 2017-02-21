@@ -1,7 +1,7 @@
 ﻿using System;
 using MySql.Data.MySqlClient;
 
-namespace Business
+namespace Api.DataContext
 {
     public class MemberContext
     {

@@ -31,14 +31,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="1.1.0" />
+    <PackageReference Include="MySql.Data" Version="7.0.6-IR31" />
   </ItemGroup>
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.DotNet.Watcher.Tools" Version="1.0.0-msbuild3-final" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Business\Business.csproj" />
-  </ItemGroup>
 
 </Project>
