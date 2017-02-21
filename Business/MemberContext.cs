@@ -8,7 +8,7 @@ namespace Business
         public static string GetAdmin()
         {
             var adminName = "";
-            using (var conn = new MySqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION") ?? "server=localhost;uid=root;pwd=admin"))
+            using (var conn = new MySqlConnection(Environment.GetEnvironmentVariable("APP_DB_CONNECTION") ?? "server=localhost;uid=root;pwd=admin"))
             {
                 conn.Open();
                 var cmd = new MySqlCommand("SELECT UserName FROM member Limit 1", conn);
