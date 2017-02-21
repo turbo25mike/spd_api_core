@@ -1,26 +1,27 @@
 using System;
+using System.Linq;
+using Api.DataContext.Models;
+using Api.DataContext.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Api.DataContext;
-using Api.Models;
 
 namespace Api.Controllers
 {
     [Route("api/status")]
     public class StatusController : Controller
     {
-        private readonly IAppSettings _settings;
+        private readonly IStore<Member, MemberStore.Column> _store;
 
-        public StatusController(IAppSettings settings)
+        public StatusController(IStore<Member, MemberStore.Column> store)
         {
-            _settings = settings;
+            _store = store;
         }
 
         [HttpGet]
         [Route("")]
         public string Get()
         {
-            return "Looking Good!";
+            return "Service Looking Good!";
         }
 
         [Authorize]
@@ -51,8 +52,9 @@ namespace Api.Controllers
         [Route("db")]
         public string GetDBStatus()
         {
-            new MemberContext(_settings).GetAdmin();
-            return "Looking Good!";
+            var result = _store.Get(limit:1);
+            var enumerable = result as Member[] ?? result.ToArray();
+            return enumerable.Any() ? $"Hey, {enumerable[0].UserName}! DB Looking Good!": "DB empty";
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Api.Models
+﻿namespace Api.DataContext.Models
 {
     public interface IAppSettings {
         string DB_Connection { get; set; }

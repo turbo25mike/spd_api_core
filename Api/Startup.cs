@@ -1,10 +1,12 @@
 using System;
+using Api.DataContext.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Api.Models;
+using Api.DataContext.Models;
+using Api.DataContext.Stores;
 
 namespace Api
 {
@@ -25,9 +27,6 @@ namespace Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            ConfigureAppSettings(services);
-
-
             // Add service and create Policy with options
             services.AddCors(options =>
             {
@@ -39,6 +38,8 @@ namespace Api
             });
             // Add framework services.
             services.AddMvc();
+
+            ConfigureAppSettings(services);
         }
 
         private void ConfigureAppSettings(IServiceCollection services)
@@ -47,6 +48,9 @@ namespace Api
             {
                 DB_Connection = Environment.GetEnvironmentVariable("APP_DB_CONNECTION") ?? Configuration["App:DB_Connection"]
             });
+
+            services.AddTransient<IDatabase, MySqlDatabase>();
+            services.AddTransient<IStore<Member, MemberStore.Column>, MemberStore>();
         }
 
 
