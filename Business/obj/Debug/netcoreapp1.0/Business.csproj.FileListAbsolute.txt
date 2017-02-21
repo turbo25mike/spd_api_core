@@ -4,3 +4,4 @@ C:\Development\GitHub\spd_api_core\Business\bin\Debug\netcoreapp1.0\Business.pdb
 C:\Development\GitHub\spd_api_core\Business\obj\Debug\netcoreapp1.0\Business.AssemblyInfo.cs
 C:\Development\GitHub\spd_api_core\Business\obj\Debug\netcoreapp1.0\Business.dll
 C:\Development\GitHub\spd_api_core\Business\obj\Debug\netcoreapp1.0\Business.pdb
+C:\Development\GitHub\spd_api_core\Business\obj\Debug\netcoreapp1.0\Business.csprojResolveAssemblyReference.cache
