@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Api.DataContext.Database
+namespace Api.DataContext
 {
     public enum DBWhereComparer { IsEqual, Equals, IsNotEqual, Like };
     public enum DBWhereOperator { None, And, Or };
-    public class DBWhere<T> : List<DBWhereColumn<T>>
+    public class DBWhere : List<DBWhereColumn>
     {
         public string Flatten()
         {
@@ -13,14 +13,14 @@ namespace Api.DataContext.Database
         }
     }
 
-    public class DBWhereColumn<T>
+    public class DBWhereColumn
     {
-        private readonly T _column;
+        private readonly string _column;
         private readonly DBWhereComparer _comparer;
         private readonly DBWhereOperator _operator;
         private readonly object _value;
 
-        public DBWhereColumn(T c, object val, DBWhereComparer cmp = DBWhereComparer.Equals, DBWhereOperator op = DBWhereOperator.None)
+        public DBWhereColumn(string c, object val, DBWhereComparer cmp = DBWhereComparer.Equals, DBWhereOperator op = DBWhereOperator.None)
         {
             _column = c;
             _comparer = cmp;

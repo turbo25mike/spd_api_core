@@ -1,12 +1,10 @@
 using System;
-using Api.DataContext.Database;
+using Api.DataContext;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Api.DataContext.Models;
-using Api.DataContext.Stores;
 
 namespace Api
 {
@@ -50,7 +48,7 @@ namespace Api
             });
 
             services.AddTransient<IDatabase, MySqlDatabase>();
-            services.AddTransient<IStore<Member, MemberStore.Column>, MemberStore>();
+            
         }
 
 

@@ -1,21 +1,22 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Api.DataContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
-    [Route("api/status")]
-    public class StatusController : BaseController
+    [Route("api/org")]
+    public class OrgController : Controller
     {
-        public StatusController(IDatabase db, IAppSettings settings)
+        private readonly IDatabase _db;
+
+        public OrgController(IDatabase db)
         {
             _db = db;
-            _appsettings = settings;
         }
 
+        [Authorize]
         [HttpGet]
         [Route("")]
         public string Get()
@@ -32,17 +33,6 @@ namespace Api.Controllers
         }
 
         [Authorize]
-        [HttpGet]
-        [Route("secure/user")]
-        public string GetSecuredUser()
-        {
-            var results = "Name: " + User.Identity.Name + ", ";
-            results += "AuthenticationType: " + User.Identity.AuthenticationType;
-            results += ", Claims: " + string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
-            results += ", Auth: " + Request.Headers["Authorization"];
-            return results;
-        }
-
         [HttpGet]
         [Route("environment")]
         public string GetEnvironment()
@@ -62,10 +52,10 @@ namespace Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("db")]
-        public async Task<string> GetDBStatus()
+        public string GetDBStatus()
         {
-            var result = await ValidateMember();
-            return result != null ? $"Hey, {result.UserName}! DB Looking Good!": "User not found.";
+            var result = _db.Select<Member>(limit:1);
+            return result != null && result.Any() ? $"Hey, {result[0].UserName}! DB Looking Good!": "DB empty";
         }
     }
 }

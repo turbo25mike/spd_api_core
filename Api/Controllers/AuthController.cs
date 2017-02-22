@@ -7,7 +7,7 @@ namespace Api.Controllers
     [Route("api/auth")]
     public class AuthController : Controller
     {
-        private IMemoryCache _cache;
+        private readonly IMemoryCache _cache;
 
         public AuthController(IMemoryCache cache)
         {
@@ -30,7 +30,5 @@ namespace Api.Controllers
                 return result;
             throw new ArgumentNullException();
         }
-
-
     }
 }
