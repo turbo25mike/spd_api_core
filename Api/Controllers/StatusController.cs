@@ -35,12 +35,18 @@ namespace Api.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("secure/user")]
-        public async Task<string> GetSecuredUser()
+        [Route("secure/user/identity")]
+        public string GetSecuredUserIdentity()
         {
-            var user = await WebService.Request<Auth0User>(RequestType.Get, $"{_appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"]);
-            var results = "User: " + user.nickname + ", User Identity Name: " + User.Identity.Name +" Claims: " + string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
-            return results;
+            return $"User.Identity Name: {User.Identity.Name} Claims: {string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"))}";
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("secure/user/auth0")]
+        public async Task<Auth0User> GetSecuredUser()
+        {
+            return await WebService.Request<Auth0User>(RequestType.Get, $"{_appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"]);
         }
 
         [Authorize]
