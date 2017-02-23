@@ -9,24 +9,40 @@ namespace Api.Controllers
 {
     public class BaseController : Controller
     {
-        internal IDatabase _db { get; set; }
-        internal IAppSettings _appsettings { get; set; }
-
-        internal async Task<Member> ValidateMember()
+        public BaseController(IDatabase db, IAppSettings settings)
         {
-            var result = _db.Select<Member>(where: new DBWhere {new DBWhereColumn(nameof(Member.LoginID), User.Identity.Name) }, limit: 1).FirstOrDefault();
-            if (result != null) return result;
+            DB = db;
+            Appsettings = settings;
+        }
 
-            //creating new user
-            var user = await WebService.Request<Auth0User>(RequestType.Get, $"{_appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"]);
-            
-            var newMember = new Member
+        internal IDatabase DB { get; set; }
+        internal IAppSettings Appsettings { get; set; }
+        private Member _currentMember;
+
+        private async Task<Member> GetCurrentMember()
+        {
+            if (_currentMember != null) return _currentMember;
+
+            var result = DB.Select<Member>(where: new DBWhere { new DBWhereColumn(nameof(Member.LoginID), User.Identity.Name) }, limit: 1).FirstOrDefault();
+            if (result != null)
+            {
+                _currentMember = result;
+            }
+            else
+            {
+                //creating new user
+                var user = await WebService.Request<Auth0User>(RequestType.Get, $"{Appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"]);
+
+                var newMember = new Member
                 {
                     LoginID = User.Identity.Name,
                     UserName = user.nickname
                 };
 
-            return (Member)_db.Insert(newMember, 0);
+                _currentMember = (Member)DB.Insert(newMember, 0);
+            }
+
+            return _currentMember;
         }
     }
 }

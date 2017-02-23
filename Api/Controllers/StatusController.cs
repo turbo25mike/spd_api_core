@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Api.Extensions;
 using Api.Models;
@@ -38,8 +39,8 @@ namespace Api.Controllers
         public async Task<string> GetSecuredUser()
         {
             var user = await WebService.Request<Auth0User>(RequestType.Get, $"{_appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"]);
-            //var results = "User: " + user.nickname + ", Claims: " + string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
-            return user.nickname;
+            var results = "User: " + user.nickname + ", User Identity Name: " + User.Identity.Name +" Claims: " + string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
+            return results;
         }
 
         [Authorize]
