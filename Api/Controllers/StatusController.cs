@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.Extensions;
 using Api.Models;
@@ -33,12 +34,30 @@ namespace Api.Controllers
             return "All good. You only get this message if you are authenticated.";
         }
 
+
+
         [Authorize]
         [HttpGet]
         [Route("secure/user/identity")]
         public string GetSecuredUserIdentity()
         {
-            return $"User.Identity Name: {User.Identity.Name} Claims: {string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"))}";
+            return User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("secure/user/claims")]
+        public string GetSecuredUserClaims()
+        {
+            return string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("secure/user/claim/{name}")]
+        public string GetSecuredUserClaim(string name)
+        {
+            return User.Claims.FirstOrDefault(c => c.Type == name)?.Value;
         }
 
         [Authorize]
