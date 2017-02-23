@@ -18,7 +18,7 @@ namespace Api.Controllers
             if (result != null) return result;
 
             //creating new user
-            var user = await WebService.Request<Auth0User>(RequestType.Get, $"{_appsettings.Auth0_Domain}userinfo", token: User.Identity.Name);
+            var user = await WebService.Request<Auth0User>(RequestType.Get, $"{_appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"]);
             
             var newMember = new Member
                 {

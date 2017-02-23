@@ -36,10 +36,7 @@ namespace Api.Controllers
         [Route("secure/user")]
         public string GetSecuredUser()
         {
-            var results = "Name: " + User.Identity.Name + ", ";
-            results += "AuthenticationType: " + User.Identity.AuthenticationType;
-            results += ", Claims: " + string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
-            results += ", Auth: " + Request.Headers["Authorization"];
+            var results = "Claims: " + string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
             return results;
         }
 
