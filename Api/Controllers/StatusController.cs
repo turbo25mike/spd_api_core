@@ -1,7 +1,5 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Api.DataContext;
 using Api.Extensions;
 using Api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -10,11 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers
 {
     [Route("api/status")]
-    public class StatusController : BaseController
+    public class StatusController : Controller
     {
-        public StatusController(IDatabase db, IAppSettings settings)
+        private readonly IAppSettings _appsettings;
+
+        public StatusController(IAppSettings settings)
         {
-            _db = db;
             _appsettings = settings;
         }
 
@@ -39,11 +38,9 @@ namespace Api.Controllers
         public async Task<string> GetSecuredUser()
         {
             var user = await WebService.Request<Auth0User>(RequestType.Get, $"{_appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"]);
-            var results = "User: " + user.nickname + ", Claims: " + string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
-            return results;
+            //var results = "User: " + user.nickname + ", Claims: " + string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
+            return user.nickname;
         }
-
-
 
         [Authorize]
         [HttpGet]
@@ -72,10 +69,11 @@ namespace Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("db")]
-        public async Task<string> GetDBStatus()
+        public string GetDBStatus()
         {
-            var result = await ValidateMember();
-            return result != null ? $"Hey, {result.UserName}! DB Looking Good!": "User not found.";
+            //var result = await ValidateMember();
+            //return result != null ? $"Hey, {result.UserName}! DB Looking Good!": "User not found.";
+            return "DB Looking Good";
         }
     }
 }
