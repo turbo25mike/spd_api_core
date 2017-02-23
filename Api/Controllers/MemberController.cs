@@ -36,7 +36,7 @@ namespace Api.Controllers
         [Route("token")]
         public string GetToken()
         {
-            return Request.Headers["Authorization"];
+            return Request.Headers["Authorization"].Last();
         }
 
         [Authorize]
@@ -60,7 +60,8 @@ namespace Api.Controllers
         [Route("auth0")]
         public async Task<Auth0User> GetAuth0Data()
         {
-            return await WebService.Request<Auth0User>(RequestType.Get, $"{Appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"]);
+            var token = Request.Headers["Authorization"];
+            return await WebService.Request<Auth0User>(RequestType.Get, $"{Appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"].Last());
         }
     }
 }
