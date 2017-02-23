@@ -13,15 +13,12 @@ namespace Api.Controllers
         public OrgController(IDatabase db, IAppSettings settings): base(db, settings){}
 
         [Authorize]
-        [HttpGet]
         [Route("")]
-        public async Task<List<Org>> Get()
+        public async Task<List<Org>> GetMemberOrgs()
         {
             var member = await GetCurrentMember();
-            var memberOrgs = DB.Select<OrgMember>(where: new DBWhere {new DBWhereColumn(nameof(OrgMember.MemberID), member.MemberID)}).Select(mo => mo.OrgID);
-            
-            return DB.Select<Org>(where: new DBWhere {new DBWhereColumn(nameof(Org.OrgID), memberOrgs)});
+            var memberOrgs = DB.Select<OrgMember>(where: new DBWhere {new DBWhereColumn(nameof(OrgMember.MemberID), member.MemberID)}).Select(mo => mo.OrgID).ToArray();
+            return memberOrgs.Any() ? DB.Select<Org>(where: new DBWhere {new DBWhereColumn(nameof(Org.OrgID), memberOrgs)}) : new List<Org>();
         }
-        
     }
 }

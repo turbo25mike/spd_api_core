@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.DataContext;
 using Api.Extensions;
@@ -23,19 +24,22 @@ namespace Api.Controllers
         {
             if (_currentMember != null) return _currentMember;
 
-            var result = DB.Select<Member>(where: new DBWhere { new DBWhereColumn(nameof(Member.LoginID), User.Identity.Name) }, limit: 1).FirstOrDefault();
+            var identity = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(identity)) return null;
+            var result = DB.Select<Member>(where: new DBWhere { new DBWhereColumn(nameof(Member.LoginID), identity) }, limit: 1).FirstOrDefault();
             if (result != null)
-            {
                 _currentMember = result;
-            }
             else
             {
+                var jwt = Request.Headers["Authorization"];
+                if (string.IsNullOrEmpty(jwt.ToString())) return null;
+
                 //creating new user
-                var user = await WebService.Request<Auth0User>(RequestType.Get, $"{Appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"]);
+                var user = await WebService.Request<Auth0User>(RequestType.Get, $"{Appsettings.Auth0_Domain}userinfo", token: jwt);
 
                 var newMember = new Member
                 {
-                    LoginID = User.Identity.Name,
+                    LoginID = identity,
                     UserName = user.nickname
                 };
 

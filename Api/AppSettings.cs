@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
-
-namespace Api
+﻿namespace Api
 {
     public interface IAppSettings {
         string DB_Connection { get; set; }
