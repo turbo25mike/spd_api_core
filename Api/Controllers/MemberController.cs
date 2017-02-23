@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.DataContext;
@@ -60,8 +61,8 @@ namespace Api.Controllers
         [Route("auth0")]
         public async Task<Auth0User> GetAuth0Data()
         {
-            var token = Request.Headers["Authorization"];
-            return await WebService.Request<Auth0User>(RequestType.Get, $"{Appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"].ToString().Substring("Bearer".Length).Trim());
+            var jwt = Request.Headers["Authorization"].ToString().Substring("Bearer".Length).Trim();
+            return await WebService.Request<Auth0User>(RequestType.Get, $"{Appsettings.Auth0_Domain}userinfo", token: jwt);
         }
     }
 }
