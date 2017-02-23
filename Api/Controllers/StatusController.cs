@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Api.DataContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,16 +30,16 @@ namespace Api.Controllers
         [Route("environment")]
         public string GetEnvironment()
         {
-            return Environment.GetEnvironmentVariable("APP_ENVIRONMENT") ?? "Development";
+            return Appsettings.Environment;
         }
 
         [Authorize]
         [HttpGet]
         [Route("db")]
-        public async Task<string> GetDBStatus()
+        public string GetDBStatus()
         {
-            var member = await GetCurrentMember();
-            return member != null ? $"Hey, {member.UserName}! DB Looking Good!": "User not found.";
+            DB.Select<Org>(limit: 1);
+            return "DB Looking Good!";
         }
     }
 }

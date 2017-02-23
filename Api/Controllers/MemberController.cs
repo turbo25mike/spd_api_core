@@ -26,7 +26,15 @@ namespace Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("identity")]
-        public string GetSecuredUserIdentity()
+        public string GetIdentity()
+        {
+            return User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("token")]
+        public string GetToken()
         {
             return User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         }
@@ -34,7 +42,7 @@ namespace Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("claims")]
-        public string GetSecuredUserClaims()
+        public string GetClaims()
         {
             return string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
         }
@@ -42,7 +50,7 @@ namespace Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("claim/{name}")]
-        public string GetSecuredUserClaim(string name)
+        public string GetClaim(string name)
         {
             return User.Claims.FirstOrDefault(c => c.Type == name)?.Value;
         }
@@ -50,7 +58,7 @@ namespace Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("auth0")]
-        public async Task<Auth0User> GetSecuredUser()
+        public async Task<Auth0User> GetAuth0Data()
         {
             return await WebService.Request<Auth0User>(RequestType.Get, $"{Appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"]);
         }

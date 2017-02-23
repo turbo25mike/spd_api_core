@@ -45,7 +45,8 @@ namespace Api
             services.AddSingleton<IAppSettings>(new AppSettings
             {
                 DB_Connection = Environment.GetEnvironmentVariable("APP_DB_CONNECTION") ?? Configuration["App:DB_Connection"],
-                Auth0_Domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN") ?? Configuration["Auth0:Domain"]
+                Auth0_Domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN") ?? Configuration["Auth0:Domain"],
+                Environment = Environment.GetEnvironmentVariable("APP_ENVIRONMENT") ?? Configuration["App:Environment"]
             });
 
             services.AddTransient<IDatabase, MySqlDatabase>();
