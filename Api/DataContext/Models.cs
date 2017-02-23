@@ -98,6 +98,8 @@ namespace Api.DataContext
         internal new void SetPrimaryKey(int id) { OrgMemberID = id; }
 
         public int OrgMemberID { get; set; }
+        public int OrgID { get; set; }
+        public int MemberID { get; set; }
     }
 
     public class Tag : BaseModel

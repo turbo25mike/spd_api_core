@@ -33,9 +33,7 @@ namespace Api.Controllers
         {
             return "All good. You only get this message if you are authenticated.";
         }
-
-
-
+        
         [Authorize]
         [HttpGet]
         [Route("secure/user/identity")]

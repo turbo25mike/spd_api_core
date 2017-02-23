@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Api.DataContext
 {
-    public enum DBWhereComparer { IsEqual, Equals, IsNotEqual, Like };
+    public enum DBWhereComparer { IsEqual, Equals, IsNotEqual, Like, In };
     public enum DBWhereOperator { None, And, Or };
     public class DBWhere : List<DBWhereColumn>
     {
@@ -28,6 +29,14 @@ namespace Api.DataContext
             _operator = op;
         }
 
+        public DBWhereColumn(string c, IEnumerable val, DBWhereOperator op = DBWhereOperator.None)
+        {
+            _column = c;
+            _comparer = DBWhereComparer.In;
+            _value = string.Join(",", val);
+            _operator = op;
+        }
+
         public string Flatten()
         {
             return _column + ComparerToString() + GetValue() + OperatorToString();
@@ -42,6 +51,9 @@ namespace Api.DataContext
 
             if (t == typeof(int) || t == typeof(decimal) || t == typeof(long))
                 return _value.ToString();
+
+            if (_comparer == DBWhereComparer.In)
+                return $"({_value})";
 
             return $"'{_value}'";
         }
@@ -58,6 +70,8 @@ namespace Api.DataContext
                     return " like ";
                 case DBWhereComparer.Equals:
                     return " = ";
+                case DBWhereComparer.In:
+                    return " in ";
                 default:
                     return " = ";
             }
@@ -65,7 +79,8 @@ namespace Api.DataContext
 
         private string OperatorToString()
         {
-            switch (_operator) {
+            switch (_operator)
+            {
                 case DBWhereOperator.None:
                     return "";
                 case DBWhereOperator.Or:

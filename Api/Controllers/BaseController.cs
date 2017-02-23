@@ -19,7 +19,7 @@ namespace Api.Controllers
         internal IAppSettings Appsettings { get; set; }
         private Member _currentMember;
 
-        private async Task<Member> GetCurrentMember()
+        internal async Task<Member> GetCurrentMember()
         {
             if (_currentMember != null) return _currentMember;
 
