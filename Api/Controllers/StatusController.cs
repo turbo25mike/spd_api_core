@@ -43,6 +43,16 @@ namespace Api.Controllers
             return results;
         }
 
+
+
+        [Authorize]
+        [HttpGet]
+        [Route("secure/auth/domain")]
+        public string GetAuth0Domain()
+        {
+            return _appsettings.Auth0_Domain;
+        }
+
         [HttpGet]
         [Route("environment")]
         public string GetEnvironment()
