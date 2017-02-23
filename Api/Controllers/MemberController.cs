@@ -36,7 +36,7 @@ namespace Api.Controllers
         [Route("token")]
         public string GetToken()
         {
-            return User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            return Request.Headers["Authorization"];
         }
 
         [Authorize]
