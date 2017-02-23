@@ -44,11 +44,12 @@ namespace Api
         {
             services.AddSingleton<IAppSettings>(new AppSettings
             {
-                DB_Connection = Environment.GetEnvironmentVariable("APP_DB_CONNECTION") ?? Configuration["App:DB_Connection"]
+                DB_Connection = Environment.GetEnvironmentVariable("APP_DB_CONNECTION") ?? Configuration["App:DB_Connection"],
+                Auth0_Domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN") ?? Configuration["Auth0:Domain"]
             });
 
             services.AddTransient<IDatabase, MySqlDatabase>();
-            
+
         }
 
 
