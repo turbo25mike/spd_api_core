@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.DataContext;
+using Api.Extensions;
+using Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,9 +36,10 @@ namespace Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("secure/user")]
-        public string GetSecuredUser()
+        public async Task<string> GetSecuredUser()
         {
-            var results = "Claims: " + string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
+            var user = await WebService.Request<Auth0User>(RequestType.Get, $"{_appsettings.Auth0_Domain}userinfo", token: Request.Headers["Authorization"]);
+            var results = "User: " + user.nickname + ", Claims: " + string.Join(",", User.Claims.Select(c => $"{c.Type}:{c.Value}"));
             return results;
         }
 
