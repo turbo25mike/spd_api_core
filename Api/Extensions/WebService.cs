@@ -35,8 +35,10 @@ namespace Api.Extensions
                     break;
             }
 
-            if (response == null || !response.IsSuccessStatusCode)
-                throw new ArgumentException("Service returned an error.");
+            if (response == null)
+                throw new ArgumentException("Webservice call responded with null response.");
+            if (!response.IsSuccessStatusCode)
+                throw new ArgumentException($"Webservice call: {response.ReasonPhrase}");
             var result = await response.Content.ReadAsStringAsync();
             return (typeof(T) == typeof(string)) ? (T)(object)result : JsonConvert.DeserializeObject<T>(result);
         }
