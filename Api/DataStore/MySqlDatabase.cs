@@ -4,6 +4,7 @@ using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Api.Extensions;
 
 namespace Api.DataStore
 {

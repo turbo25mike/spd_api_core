@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace Api.DataStore
 {
@@ -15,10 +12,6 @@ namespace Api.DataStore
         DateTime? UpdatedDate { get; set; }
         int RemovedBy { get; set; }
         DateTime? RemovedDate { get; set; }
-
-        object GetValue(string propertyName);
-        void SetValue(string propertyName, object val);
-        Dictionary<string, object> CreateSet(string[] setProps = null);
     }
 
     public class BaseModel : IModel
@@ -37,35 +30,6 @@ namespace Api.DataStore
         public DateTime? UpdatedDate { get; set; }
         public int RemovedBy { get; set; }
         public DateTime? RemovedDate { get; set; }
-
-        public object GetValue(string propertyName)
-        {
-            return GetType().GetProperty(propertyName).GetValue(this);
-        }
-
-        public void SetValue(string propertyName, object val)
-        {
-            GetType().GetProperty(propertyName).SetValue(this, val);
-        }
-
-        public Dictionary<string, object> CreateSet(string[] setProps = null)
-        {
-            if (setProps == null)
-            {
-                setProps = (from prop in GetType().GetProperties()
-                           where
-                             prop.CanWrite &&
-                             prop.Name != "CreatedBy" && prop.Name != "CreatedDate" &&
-                             prop.Name != "UpdatedBy" && prop.Name != "UpdatedDate" &&
-                             prop.Name != "RemovedBy" && prop.Name != "RemovedDate"
-                           select prop.Name).ToArray();
-            }
-            var set = new Dictionary<string, object>();
-            if (setProps == null) return null;
-            foreach (var prop in setProps)
-                set.Add(prop, GetValue(prop));
-            return set;
-        }
     }
 
     public class Member : BaseModel
