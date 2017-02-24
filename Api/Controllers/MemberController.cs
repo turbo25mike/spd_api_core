@@ -54,20 +54,8 @@ namespace Api.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("auth0")]
-        public Member GetAuth([FromBody] Auth0User data)
-        {
-            return new Member
-            {
-                LoginID = data.user_id,
-                UserName = data.nickname
-            };
-        }
-
-        [Authorize]
-        [HttpPost]
         [Route("")]
-        public void Post([FromBody] Auth0User data)
+        public string Post([FromBody] Auth0User data)
         {
             var member = new Member
                 {
@@ -79,6 +67,8 @@ namespace Api.Controllers
                 DB.Update(member, GetCurrentMember().MemberID);
             else
                 DB.Insert(member, 0);
+
+            return $"Welcome, {data.nickname}";
         }
     }
 }
