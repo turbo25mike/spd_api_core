@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Api.DataContext;
-using Api.Extensions;
+using Api.DataStore;
 using Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,19 +11,16 @@ namespace Api.Controllers
     [Route("api/member")]
     public class MemberController : BaseController
     {
-        public MemberController(IDatabase db, IAppSettings settings) : base(db, settings) { }
+        public MemberController(IDatabase db, IMemberContext context) : base(db, context) {}
 
         [Authorize]
-        [HttpGet]
         [Route("")]
-        public async Task<string> GetMemberName()
+        public string GetMemberName()
         {
-            var member = await GetCurrentMember();
-            return $"Welcome, {member.UserName}!";
+            return $"Welcome, {Context.CurrentMember.UserName}!";
         }
 
         [Authorize]
-        [HttpGet]
         [Route("identity")]
         public string GetIdentity()
         {
@@ -33,7 +28,6 @@ namespace Api.Controllers
         }
 
         [Authorize]
-        [HttpGet]
         [Route("token")]
         public string GetToken()
         {
@@ -41,7 +35,6 @@ namespace Api.Controllers
         }
 
         [Authorize]
-        [HttpGet]
         [Route("claims")]
         public string GetClaims()
         {
@@ -49,7 +42,6 @@ namespace Api.Controllers
         }
 
         [Authorize]
-        [HttpGet]
         [Route("claim/{name}")]
         public string GetClaim(string name)
         {
@@ -57,12 +49,19 @@ namespace Api.Controllers
         }
 
         [Authorize]
-        [HttpGet]
-        [Route("auth0")]
-        public async Task<Auth0User> GetAuth0Data()
+        [Route("")]
+        public void Post(Auth0User data)
         {
-            var jwt = Request.Headers["Authorization"].ToString().Substring("Bearer".Length).Trim();
-            return await WebService.Request<Auth0User>(RequestType.Get, $"{Appsettings.Auth0_Domain}userinfo", token: jwt);
+            var member = new Member
+                {
+                    LoginID = data.user_id,
+                    UserName = data.nickname
+                };
+
+            if (Context.CurrentMember != null)
+                DB.Update(member);
+            else
+                DB.Insert(member);
         }
     }
 }

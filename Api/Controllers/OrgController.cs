@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Api.DataContext;
+using Api.DataStore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,14 +10,13 @@ namespace Api.Controllers
     [Route("api/org")]
     public class OrgController : BaseController
     {
-        public OrgController(IDatabase db, IAppSettings settings): base(db, settings){}
+        public OrgController(IDatabase db, IMemberContext context) : base(db, context) { }
 
         [Authorize]
         [Route("")]
-        public async Task<List<Org>> GetMemberOrgs()
+        public List<Org> GetMemberOrgs()
         {
-            var member = await GetCurrentMember();
-            var memberOrgs = DB.Select<OrgMember>(where: new DBWhere {new DBWhereColumn(nameof(OrgMember.MemberID), member.MemberID)}).Select(mo => mo.OrgID).ToArray();
+            var memberOrgs = DB.Select<OrgMember>(where: new DBWhere {new DBWhereColumn(nameof(OrgMember.MemberID), Context.CurrentMember.MemberID)}).Select(mo => mo.OrgID).ToArray();
             return memberOrgs.Any() ? DB.Select<Org>(where: new DBWhere {new DBWhereColumn(nameof(Org.OrgID), memberOrgs)}) : new List<Org>();
         }
     }

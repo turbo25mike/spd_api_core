@@ -4,16 +4,19 @@ using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Api.DataContext;
 
-namespace Api.DataContext
+namespace Api.DataStore
 {
     public class MySqlDatabase : IDatabase
     {
         private readonly IAppSettings _settings;
+        private readonly IMemberContext _memberContext;
 
-        public MySqlDatabase(IAppSettings settings)
+        public MySqlDatabase(IAppSettings settings, IMemberContext member)
         {
             _settings = settings;
+            _memberContext = member;
         }
 
         public List<T> Select<T>(string[] columnList = null, DBWhere where = null, int? limitAmount = null)
@@ -30,55 +33,50 @@ namespace Api.DataContext
             return Query<T>($"SELECT {columns} FROM {table} {whereColumns} {limit}");
         }
 
-        public IModel Insert(IModel request, int memberID)
+        public IModel Insert(IModel request)
         {
             var currentDate = DateTime.Now;
             var table = GetTableName(request.GetType().Name);
 
-            var set = (from prop in request.GetType().GetProperties()
-                              where
-                                prop.CanWrite &&
-                                prop.Name != "CreatedBy" && prop.Name != "CreatedDate" &&
-                                prop.Name != "UpdatedBy" && prop.Name != "UpdatedDate" &&
-                                prop.Name != "RemovedBy" && prop.Name != "RemovedDate"
-                              select prop.Name).ToArray();
-
-            var setColumns = request.CreateSet(set);
-            setColumns.Add("CreatedBy", memberID);
+            var setColumns = request.CreateSet();
+            setColumns.Add("CreatedBy", _memberContext.CurrentMember.MemberID);
             setColumns.Add("CreatedDate", currentDate);
-            setColumns.Add("UpdatedBy", memberID);
+            setColumns.Add("UpdatedBy", _memberContext.CurrentMember.MemberID);
             setColumns.Add("UpdatedDate", currentDate);
             
 
             var id = Execute($"INSERT INTO {table} ({setColumns.FlattenKeys()}) VALUES ({setColumns.FlattenValues()})");
-            request.SetPrimaryKey(id);
-            request.CreatedBy = memberID;
+            request.SetValue(request.PrimaryKey, id);
+            request.CreatedBy = _memberContext.CurrentMember.MemberID;
             request.CreatedDate = currentDate;
-            request.UpdatedBy = memberID;
+            request.UpdatedBy = _memberContext.CurrentMember.MemberID;
             request.UpdatedDate = currentDate;
             return request;
         }
 
-        public IModel Update(IModel request, string[] set, DBWhere where, int memberID)
+        public IModel Update(IModel request, string[] set = null, DBWhere where = null)
         {
             var currentDate = DateTime.Now;
             var setColumns = request.CreateSet(set);
-            setColumns.Add("UpdatedBy", memberID);
+            setColumns.Add("UpdatedBy", _memberContext.CurrentMember.MemberID);
             setColumns.Add("UpdatedDate", currentDate);
+
+            if(where == null)
+                where = new DBWhere { new DBWhereColumn(request.PrimaryKey, request.GetValue(request.PrimaryKey)) };
 
             Execute($"UPDATE {GetTableName(request.GetType().Name)} SET {setColumns.Flatten()} WHERE {where.Flatten()}");
 
-            request.UpdatedBy = memberID;
+            request.UpdatedBy = _memberContext.CurrentMember.MemberID;
             request.UpdatedDate = currentDate;
             return request;
         }
 
-        public void Delete<T>(int id, int memberID)
+        public void Delete<T>(int id)
         {
             var currentDate = DateTime.Now;
             var setColumns = new Dictionary<string, object>
             {
-                ["RemovedBy"] = memberID,
+                ["RemovedBy"] = _memberContext.CurrentMember.MemberID,
                 ["RemovedDate"] = currentDate
             };
             var request = (IModel)Activator.CreateInstance<T>();
@@ -144,6 +142,17 @@ namespace Api.DataContext
                 }
             }
             return list;
+        }
+
+        private string[] GetObjectProperties(IModel request)
+        {
+            return (from prop in request.GetType().GetProperties()
+                       where
+                         prop.CanWrite &&
+                         prop.Name != "CreatedBy" && prop.Name != "CreatedDate" &&
+                         prop.Name != "UpdatedBy" && prop.Name != "UpdatedDate" &&
+                         prop.Name != "RemovedBy" && prop.Name != "RemovedDate"
+                       select prop.Name).ToArray();
         }
 
         private object GetColumn(MySqlDataReader dr, string columnName)

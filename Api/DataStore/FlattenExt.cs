@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Api.DataContext
+namespace Api.DataStore
 {
     public static class FlattenExt
     {

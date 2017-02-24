@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Api.DataContext
+namespace Api.DataStore
 {
     public enum DBWhereComparer { IsEqual, Equals, IsNotEqual, Like, In };
     public enum DBWhereOperator { None, And, Or };

@@ -1,5 +1,6 @@
 using System;
 using Api.DataContext;
+using Api.DataStore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +9,13 @@ namespace Api.Controllers
     [Route("api/status")]
     public class StatusController : BaseController
     {
-        public StatusController(IDatabase db, IAppSettings settings) : base(db, settings){}
+        private readonly IAppSettings _appSettings;
 
-        [HttpGet]
+        public StatusController(IDatabase db, IMemberContext memberContext, IAppSettings settings) : base(db, memberContext)
+        {
+            _appSettings = settings;
+        }
+
         [Route("")]
         public string Get()
         {
@@ -18,23 +23,20 @@ namespace Api.Controllers
         }
 
         [Authorize]
-        [HttpGet]
-        [Route("secure/auth/domain")]
+        [Route("auth")]
         public string GetAuth0Domain()
         {
-            return Appsettings.Auth0_Domain;
+            return _appSettings.Auth0_Domain;
         }
 
         [Authorize]
-        [HttpGet]
         [Route("environment")]
         public string GetEnvironment()
         {
-            return Appsettings.Environment;
+            return _appSettings.Environment;
         }
 
         [Authorize]
-        [HttpGet]
         [Route("db")]
         public string GetDBStatus()
         {

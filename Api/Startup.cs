@@ -1,5 +1,6 @@
 using System;
 using Api.DataContext;
+using Api.DataStore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -50,7 +51,7 @@ namespace Api
             });
 
             services.AddTransient<IDatabase, MySqlDatabase>();
-
+            services.AddTransient<IMemberContext, MemberContext>();
         }
 
 

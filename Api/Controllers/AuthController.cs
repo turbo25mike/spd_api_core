@@ -14,14 +14,12 @@ namespace Api.Controllers
             _cache = cache;
         }
 
-        [HttpGet]
         [Route("")]
         public void GetAuth(string code, string state)
         {
             _cache.Set(state.TrimEnd('#'), code, new TimeSpan(0, 0, 0, 20));
         }
         
-        [HttpGet]
         [Route("{state}/code")]
         public string GetAuthCode(string state)
         {
