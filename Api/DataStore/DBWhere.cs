@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Api.DataStore
@@ -29,7 +28,7 @@ namespace Api.DataStore
             _operator = op;
         }
 
-        public DBWhereColumn(string c, IEnumerable val, DBWhereOperator op = DBWhereOperator.None)
+        public DBWhereColumn(string c, IEnumerable<object> val, DBWhereOperator op = DBWhereOperator.None)
         {
             _column = c;
             _comparer = DBWhereComparer.In;
