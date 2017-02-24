@@ -14,6 +14,7 @@ namespace Api.Controllers
         public MemberController(IDatabase db, IMemberContext context) : base(db, context) {}
 
         [Authorize]
+        [HttpGet]
         [Route("")]
         public string GetMemberName()
         {
@@ -21,6 +22,7 @@ namespace Api.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         [Route("identity")]
         public string GetIdentity()
         {
@@ -28,6 +30,7 @@ namespace Api.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         [Route("token")]
         public string GetToken()
         {
@@ -35,6 +38,7 @@ namespace Api.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         [Route("claims")]
         public string GetClaims()
         {
@@ -42,6 +46,7 @@ namespace Api.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         [Route("claim/{name}")]
         public string GetClaim(string name)
         {
@@ -49,6 +54,7 @@ namespace Api.Controllers
         }
 
         [Authorize]
+        [HttpPost]
         [Route("")]
         public void Post(Auth0User data)
         {

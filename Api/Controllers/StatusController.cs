@@ -16,6 +16,7 @@ namespace Api.Controllers
             _appSettings = settings;
         }
 
+        [HttpGet]
         [Route("")]
         public string Get()
         {
@@ -23,6 +24,7 @@ namespace Api.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         [Route("auth")]
         public string GetAuth0Domain()
         {
@@ -30,6 +32,7 @@ namespace Api.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         [Route("environment")]
         public string GetEnvironment()
         {
@@ -37,6 +40,7 @@ namespace Api.Controllers
         }
 
         [Authorize]
+        [HttpGet]
         [Route("db")]
         public string GetDBStatus()
         {

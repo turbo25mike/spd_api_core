@@ -13,6 +13,7 @@ namespace Api.Controllers
         public OrgController(IDatabase db, IMemberContext context) : base(db, context) { }
 
         [Authorize]
+        [HttpGet]
         [Route("")]
         public List<Org> GetMemberOrgs()
         {
