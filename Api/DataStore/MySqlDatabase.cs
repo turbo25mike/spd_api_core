@@ -161,9 +161,9 @@ namespace Api.DataStore
         {
             if (_currentMemberID.HasValue) return _currentMemberID.Value;
             var identity = _httpContextAccessor.HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(identity)) throw new ArgumentNullException(nameof(ClaimsPrincipal));
+            if (string.IsNullOrEmpty(identity)) throw new ArgumentNullException(nameof(_httpContextAccessor));
             var result = Select<Member>(new[] { nameof(Member.MemberID) }, new DBWhere { new DBWhereColumn(nameof(Member.LoginID), identity) }, 1).FirstOrDefault();
-            if (result == null) throw new ArgumentNullException(nameof(ClaimsPrincipal));
+            if (result == null) throw new ArgumentNullException(nameof(_httpContextAccessor));
             _currentMemberID = result.MemberID;
             return _currentMemberID.Value;
         }
