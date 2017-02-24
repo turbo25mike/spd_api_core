@@ -55,7 +55,7 @@ namespace Api.Controllers
         [Authorize]
         [HttpPost]
         [Route("auth0")]
-        public Member GetAuth(Auth0User data)
+        public Member GetAuth([FromBody] Auth0User data)
         {
             return new Member
             {
@@ -67,7 +67,7 @@ namespace Api.Controllers
         [Authorize]
         [HttpPost]
         [Route("")]
-        public void Post(Auth0User data)
+        public void Post([FromBody] Auth0User data)
         {
             var member = new Member
                 {
