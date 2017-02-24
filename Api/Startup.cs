@@ -1,4 +1,6 @@
 using System;
+using System.Security.Claims;
+using System.Security.Principal;
 using Api.DataContext;
 using Api.DataStore;
 using Microsoft.AspNetCore.Builder;
@@ -52,6 +54,7 @@ namespace Api
 
             services.AddTransient<IDatabase, MySqlDatabase>();
             services.AddTransient<IMemberContext, MemberContext>();
+            services.AddTransient<IPrincipal, ClaimsPrincipal>();
         }
 
 
