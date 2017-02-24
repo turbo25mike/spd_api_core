@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Reflection;
-using System.Security.Claims;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Http;
 
 namespace Api.DataStore
 {
@@ -13,10 +11,9 @@ namespace Api.DataStore
     {
         private readonly IAppSettings _settings;
 
-        public MySqlDatabase(IAppSettings settings, IHttpContextAccessor httpContextAccessor)
+        public MySqlDatabase(IAppSettings settings)
         {
             _settings = settings;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public List<T> Select<T>(string[] columnList = null, DBWhere where = null, int? limitAmount = null)
@@ -33,32 +30,32 @@ namespace Api.DataStore
             return Query<T>($"SELECT {columns} FROM {table} {whereColumns} {limit}");
         }
 
-        public IModel Insert(IModel request)
+        public IModel Insert(IModel request, int memberID)
         {
             var currentDate = DateTime.Now;
             var table = GetTableName(request.GetType().Name);
 
             var setColumns = request.CreateSet();
-            setColumns.Add("CreatedBy", GetCurrentMemberID());
+            setColumns.Add("CreatedBy", memberID);
             setColumns.Add("CreatedDate", currentDate);
-            setColumns.Add("UpdatedBy", GetCurrentMemberID());
+            setColumns.Add("UpdatedBy", memberID);
             setColumns.Add("UpdatedDate", currentDate);
 
 
             var id = Execute($"INSERT INTO {table} ({setColumns.FlattenKeys()}) VALUES ({setColumns.FlattenValues()})");
             request.SetValue(request.PrimaryKey, id);
-            request.CreatedBy = GetCurrentMemberID();
+            request.CreatedBy = memberID;
             request.CreatedDate = currentDate;
-            request.UpdatedBy = GetCurrentMemberID();
+            request.UpdatedBy = memberID;
             request.UpdatedDate = currentDate;
             return request;
         }
 
-        public IModel Update(IModel request, string[] set = null, DBWhere where = null)
+        public IModel Update(IModel request, int memberID, string[] set = null, DBWhere where = null)
         {
             var currentDate = DateTime.Now;
             var setColumns = request.CreateSet(set);
-            setColumns.Add("UpdatedBy", GetCurrentMemberID());
+            setColumns.Add("UpdatedBy", memberID);
             setColumns.Add("UpdatedDate", currentDate);
 
             if (where == null)
@@ -66,17 +63,17 @@ namespace Api.DataStore
 
             Execute($"UPDATE {GetTableName(request.GetType().Name)} SET {setColumns.Flatten()} WHERE {where.Flatten()}");
 
-            request.UpdatedBy = GetCurrentMemberID();
+            request.UpdatedBy = memberID;
             request.UpdatedDate = currentDate;
             return request;
         }
 
-        public void Delete<T>(int id)
+        public void Delete<T>(int id, int memberID)
         {
             var currentDate = DateTime.Now;
             var setColumns = new Dictionary<string, object>
             {
-                ["RemovedBy"] = GetCurrentMemberID(),
+                ["RemovedBy"] = memberID,
                 ["RemovedDate"] = currentDate
             };
             var request = (IModel)Activator.CreateInstance<T>();
@@ -152,20 +149,6 @@ namespace Api.DataStore
                     return dr[i];
             }
             return DBNull.Value;
-        }
-
-        private int? _currentMemberID;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        private int GetCurrentMemberID()
-        {
-            if (_currentMemberID.HasValue) return _currentMemberID.Value;
-            var identity = _httpContextAccessor.HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(identity)) throw new ArgumentNullException(nameof(_httpContextAccessor));
-            var result = Select<Member>(new[] { nameof(Member.MemberID) }, new DBWhere { new DBWhereColumn(nameof(Member.LoginID), identity) }, 1).FirstOrDefault();
-            if (result == null) throw new ArgumentNullException(nameof(_httpContextAccessor));
-            _currentMemberID = result.MemberID;
-            return _currentMemberID.Value;
         }
     }
 }

@@ -1,5 +1,3 @@
-using System;
-using Api.DataContext;
 using Api.DataStore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +9,7 @@ namespace Api.Controllers
     {
         private readonly IAppSettings _appSettings;
 
-        public StatusController(IDatabase db, IMemberContext memberContext, IAppSettings settings) : base(db, memberContext)
+        public StatusController(IDatabase db, IAppSettings settings) : base(db)
         {
             _appSettings = settings;
         }

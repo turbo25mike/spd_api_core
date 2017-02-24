@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Security.Claims;
-using Api.DataContext;
 using Api.DataStore;
 using Api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -11,14 +10,14 @@ namespace Api.Controllers
     [Route("api/member")]
     public class MemberController : BaseController
     {
-        public MemberController(IDatabase db, IMemberContext context) : base(db, context) {}
+        public MemberController(IDatabase db) : base(db) {}
 
         [Authorize]
         [HttpGet]
         [Route("")]
         public string GetMemberName()
         {
-            return $"Welcome, {Context.CurrentMember.UserName}!";
+            return $"Welcome, {CurrentMember.UserName}!";
         }
 
         [Authorize]
@@ -64,10 +63,10 @@ namespace Api.Controllers
                     UserName = data.nickname
                 };
 
-            if (Context.CurrentMember != null)
-                DB.Update(member);
+            if (CurrentMember != null)
+                DB.Update(member, CurrentMember.MemberID);
             else
-                DB.Insert(member);
+                DB.Insert(member, 0);
         }
     }
 }
