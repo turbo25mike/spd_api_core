@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http;
 
 namespace Api.DataStore
 {
@@ -12,9 +13,10 @@ namespace Api.DataStore
     {
         private readonly IAppSettings _settings;
 
-        public MySqlDatabase(IAppSettings settings)
+        public MySqlDatabase(IAppSettings settings, IHttpContextAccessor httpContextAccessor)
         {
             _settings = settings;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public List<T> Select<T>(string[] columnList = null, DBWhere where = null, int? limitAmount = null)
@@ -153,10 +155,12 @@ namespace Api.DataStore
         }
 
         private int? _currentMemberID;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         private int GetCurrentMemberID()
         {
             if (_currentMemberID.HasValue) return _currentMemberID.Value;
-            var identity = ClaimsPrincipal.Current?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            var identity = _httpContextAccessor.HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(identity)) throw new ArgumentNullException(nameof(ClaimsPrincipal));
             var result = Select<Member>(new[] { nameof(Member.MemberID) }, new DBWhere { new DBWhereColumn(nameof(Member.LoginID), identity) }, 1).FirstOrDefault();
             if (result == null) throw new ArgumentNullException(nameof(ClaimsPrincipal));

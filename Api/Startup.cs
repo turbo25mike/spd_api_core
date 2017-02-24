@@ -5,6 +5,7 @@ using Api.DataContext;
 using Api.DataStore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -54,7 +55,7 @@ namespace Api
 
             services.AddTransient<IDatabase, MySqlDatabase>();
             services.AddTransient<IMemberContext, MemberContext>();
-            services.AddTransient<IPrincipal, ClaimsPrincipal>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
 
