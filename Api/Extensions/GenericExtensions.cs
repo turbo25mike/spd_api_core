@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -21,9 +20,9 @@ namespace Api.Extensions
         {
             if (setProps == null)
             {
-                setProps = (from prop in src.GetType().GetProperties()
+                setProps = (from prop in src.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
                             where
-                              prop.CanWrite &&
+                              prop.CanWrite && prop.GetSetMethod(true).IsPublic &&
                               prop.Name != "CreatedBy" && prop.Name != "CreatedDate" &&
                               prop.Name != "UpdatedBy" && prop.Name != "UpdatedDate" &&
                               prop.Name != "RemovedBy" && prop.Name != "RemovedDate"
