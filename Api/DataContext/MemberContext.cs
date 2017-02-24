@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Security.Claims;
-using System.Security.Principal;
 using Api.DataStore;
 
 namespace Api.DataContext
