@@ -54,6 +54,18 @@ namespace Api.Controllers
 
         [Authorize]
         [HttpPost]
+        [Route("auth0")]
+        public Member GetAuth(Auth0User data)
+        {
+            return new Member
+            {
+                LoginID = data.user_id,
+                UserName = data.nickname
+            };
+        }
+
+        [Authorize]
+        [HttpPost]
         [Route("")]
         public void Post(Auth0User data)
         {
