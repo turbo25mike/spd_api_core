@@ -17,9 +17,9 @@ namespace Api.Controllers
         [Route("")]
         public string GetMemberName()
         {
-            return $"Welcome, {CurrentMember.UserName}!";
+            return $"Welcome, {GetCurrentMember().UserName}!";
         }
-
+    
         [Authorize]
         [HttpGet]
         [Route("identity")]
@@ -75,8 +75,8 @@ namespace Api.Controllers
                     UserName = data.nickname
                 };
 
-            if (CurrentMember != null)
-                DB.Update(member, CurrentMember.MemberID);
+            if (GetCurrentMember() != null)
+                DB.Update(member, GetCurrentMember().MemberID);
             else
                 DB.Insert(member, 0);
         }
