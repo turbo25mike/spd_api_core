@@ -19,10 +19,7 @@ namespace Api.DataStore
         protected Action GetPrimaryKeyVal;
         public static string TableName;
 
-        public string PrimaryKey
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public string PrimaryKey => "";
 
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
