@@ -64,7 +64,7 @@ namespace Api.Controllers
                 };
 
             if (GetCurrentMember() != null)
-                DB.Update(member, GetCurrentMember().MemberID);
+                DB.Update(member, GetCurrentMember().MemberID, new [] {nameof(Member.LoginID), nameof(Member.UserName)});
             else
                 DB.Insert(member, 0);
 

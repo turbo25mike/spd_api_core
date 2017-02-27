@@ -8,12 +8,12 @@ namespace Api.Extensions
     {
         public static object GetValue<T>(this T src, string propertyName)
         {
-            return src.GetType().GetProperty(propertyName).GetValue(src);
+            return src.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)?.GetValue(src);
         }
 
         public static void SetValue<T>(this T src, string propertyName, object val)
         {
-            src.GetType().GetProperty(propertyName).SetValue(src, val);
+            src.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)?.SetValue(src, val);
         }
 
         public static Dictionary<string, object> CreateSet<T>(this T src, string[] setProps = null)
