@@ -57,16 +57,22 @@ namespace Api.Controllers
         [Route("")]
         public string Post([FromBody] Auth0User data)
         {
-            var member = new Member
-                {
-                    LoginID = data.user_id,
-                    UserName = data.nickname
-                };
-
             if (GetCurrentMember() != null)
-                DB.Update(member, GetCurrentMember().MemberID, new [] {nameof(Member.LoginID), nameof(Member.UserName)});
+            {
+                var currentMember = GetCurrentMember();
+                currentMember.LoginID = data.user_id;
+                currentMember.UserName = data.nickname;
+                DB.Update(currentMember, currentMember.MemberID, new[] {nameof(Member.LoginID), nameof(Member.UserName)});
+            }
             else
-                DB.Insert(member, 0);
+            {
+                DB.Insert(new Member
+                    {
+                        LoginID = data.user_id,
+                        UserName = data.nickname
+                    }, 0);
+            }
+
 
             return $"Welcome, {data.nickname}";
         }
