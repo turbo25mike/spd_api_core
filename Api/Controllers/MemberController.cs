@@ -73,7 +73,6 @@ namespace Api.Controllers
                     }, 0);
             }
 
-
             return $"Welcome, {data.nickname}";
         }
     }

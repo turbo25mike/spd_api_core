@@ -16,8 +16,8 @@ namespace Api.Controllers
         [Route("")]
         public List<Org> GetMemberOrgs()
         {
-            var memberOrgs = DB.Select<OrgMember>(where: new DBWhere {new DBWhereColumn(nameof(OrgMember.MemberID), GetCurrentMember().MemberID)}).Select(mo => mo.OrgID).ToArray();
-            return memberOrgs.Any() ? DB.Select<Org>(where: new DBWhere {new DBWhereColumn(nameof(Org.OrgID), memberOrgs)}) : new List<Org>();
+            var memberOrgs = DB.Select<OrgMember>(where: new Where {new WhereColumn<OrgMember>(nameof(OrgMember.MemberID), GetCurrentMember().MemberID)}).Select(mo => mo.OrgID).ToArray();
+            return memberOrgs.Any() ? DB.Select<Org>(where: new Where {new WhereColumn<OrgMember>(nameof(Org.OrgID), memberOrgs)}) : new List<Org>();
         }
     }
 }

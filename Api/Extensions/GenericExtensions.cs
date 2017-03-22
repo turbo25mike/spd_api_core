@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using Api.DataStore;
 
 namespace Api.Extensions
 {
@@ -34,5 +36,23 @@ namespace Api.Extensions
                 set.Add(prop, GetValue(src, prop));
             return set;
         }
+
+        public static string SplitNameOnUppercase(this object obj, string seperator = "_")
+        {
+            var objectName = obj.GetType().Name;
+            return SplitNameOnUppercase(objectName, seperator);
+        }
+        
+        public static string SplitNameOnUppercase(this string objectName, string seperator = "_")
+        {
+            var r = new Regex(@"
+                (?<=[A-Z])(?=[A-Z][a-z]) |
+                 (?<=[^A-Z])(?=[A-Z]) |
+                 (?<=[A-Za-z])(?=[^A-Za-z])", RegexOptions.IgnorePatternWhitespace);
+
+            return r.Replace(objectName, seperator).ToLower();
+        }
+
+        
     }
 }

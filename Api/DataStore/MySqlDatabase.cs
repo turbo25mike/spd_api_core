@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Api.Extensions;
 
 namespace Api.DataStore
@@ -17,31 +17,38 @@ namespace Api.DataStore
             _settings = settings;
         }
 
-        public List<T> Select<T>(string[] columnList = null, DBWhere where = null, int? limitAmount = null)
+        public List<T> Select<T>(TableColumns columnList = null, Joins joins = null, Where where = null, int? limitAmount = null)
         {
-            var request = Activator.CreateInstance<T>();
-            var table = GetTableName(typeof(T).Name);
+            var table = typeof(T).Name.SplitNameOnUppercase();
+            var columns = "";
             if (columnList == null)
-                columnList = (from prop in request.GetType().GetProperties()
-                              where prop.CanWrite && prop.Name != "RemovedBy" && prop.Name != "RemovedDate"
-                              select prop.Name).ToArray();
-            var columns = string.Join(",", columnList);
+            {
+                var columnNames = from prop in typeof(T).GetProperties()
+                                  where prop.CanWrite && prop.Name != "RemovedBy" && prop.Name != "RemovedDate"
+                                  select prop.Name;
+
+                columnList = new TableColumns();
+                columnList.AddRange(columnNames.Select(c => new TableColumn<T>(c)));
+            }
+
+            columns = columnList.Flatten();
+            var join = joins == null ? "" : joins.Flatten();
+
             var whereColumns = where == null ? "" : $"WHERE {where.Flatten()}";
             var limit = limitAmount.HasValue ? $"LIMIT {limitAmount}" : "";
-            return Query<T>($"SELECT {columns} FROM {table} {whereColumns} {limit}");
+            return Query<T>($"SELECT {columns} FROM {table} {join} {whereColumns} {limit}");
         }
 
         public IModel Insert(IModel request, int memberID)
         {
             var currentDate = DateTime.Now;
-            var table = GetTableName(request.GetType().Name);
+            var table = request.SplitNameOnUppercase();
 
             var setColumns = request.CreateSet();
             setColumns.Add("CreatedBy", memberID);
             setColumns.Add("CreatedDate", currentDate);
             setColumns.Add("UpdatedBy", memberID);
             setColumns.Add("UpdatedDate", currentDate);
-
 
             var id = Execute($"INSERT INTO {table} ({setColumns.FlattenKeys()}) VALUES ({setColumns.FlattenValues()})");
             request.SetValue(request.PrimaryKey, id);
@@ -52,7 +59,7 @@ namespace Api.DataStore
             return request;
         }
 
-        public IModel Update(IModel request, int memberID, string[] set = null, DBWhere where = null)
+        public IModel Update(IModel request, int memberID, string[] set = null, Where where = null)
         {
             var currentDate = DateTime.Now;
             var setColumns = request.CreateSet(set);
@@ -60,9 +67,14 @@ namespace Api.DataStore
             setColumns.Add("UpdatedDate", currentDate);
 
             if (where == null)
-                where = new DBWhere { new DBWhereColumn(request.PrimaryKey, request.GetValue(request.PrimaryKey)) };
+            {
+                where = new Where
+                    {
+                        new WhereColumn<Member>(request.PrimaryKey, memberID)
+                    };
+            }
 
-            Execute($"UPDATE {GetTableName(request.GetType().Name)} SET {setColumns.Flatten()} WHERE {where.Flatten()}");
+            Execute($"UPDATE {request.SplitNameOnUppercase()} SET {setColumns.Flatten()} WHERE {where.Flatten()}");
 
             request.UpdatedBy = memberID;
             request.UpdatedDate = currentDate;
@@ -79,12 +91,12 @@ namespace Api.DataStore
             };
             var request = (IModel)Activator.CreateInstance<T>();
 
-            var where = new DBWhere
+            var where = new Where
             {
-                new DBWhereColumn(request.PrimaryKey, request.GetValue(request.PrimaryKey))
+                new WhereColumn<T>(request.PrimaryKey, request.GetValue(request.PrimaryKey))
             };
 
-            Execute($"UPDATE {GetTableName(request.GetType().Name)} SET {setColumns.Flatten()} WHERE {where.Flatten()}");
+            Execute($"UPDATE {request.SplitNameOnUppercase()} SET {setColumns.Flatten()} WHERE {where.Flatten()}");
         }
 
         private int Execute(string command)
@@ -103,16 +115,6 @@ namespace Api.DataStore
             return result;
         }
 
-        private string GetTableName(string className)
-        {
-            var r = new Regex(@"
-                (?<=[A-Z])(?=[A-Z][a-z]) |
-                 (?<=[^A-Z])(?=[A-Z]) |
-                 (?<=[A-Za-z])(?=[^A-Za-z])", RegexOptions.IgnorePatternWhitespace);
-
-            return r.Replace(className, "_").ToLower();
-        }
-
         private List<T> Query<T>(string command)
         {
             var list = new List<T>();
@@ -124,16 +126,18 @@ namespace Api.DataStore
                     cmd.CommandText = command;
                     using (var reader = cmd.ExecuteReader())
                     {
+                        var columns = Enumerable.Range(0, reader.FieldCount).Select(reader.GetName).ToList();
+
                         while (reader.Read())
                         {
                             var obj = Activator.CreateInstance<T>();
-                            foreach (var prop in obj.GetType().GetProperties())
+
+                            foreach (var prop in columns)
                             {
-                                if (prop.CanWrite && !Equals(GetColumn(reader, prop.Name), DBNull.Value))
-                                {
-                                    prop.SetValue(obj, reader[prop.Name], null);
-                                }
+                                var model = obj as Model;
+                                model?.SetProp(reader[prop]);
                             }
+                                
                             list.Add(obj);
                         }
                     }

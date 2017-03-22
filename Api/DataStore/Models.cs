@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection;
+using System.Linq;
 
 namespace Api.DataStore
 {
@@ -14,10 +16,23 @@ namespace Api.DataStore
         DateTime? RemovedDate { get; set; }
     }
 
-    public class BaseModel
+    public static class ModelHelper
     {
-        protected Action GetPrimaryKeyVal;
-        public static string TableName;
+        public static TableColumns GetColumns<T>()
+        {
+            var result = new TableColumns();
+            var columnNames = from prop in typeof(T).GetProperties()
+                              where prop.CanWrite && prop.Name != "RemovedBy" && prop.Name != "RemovedDate"
+                              select prop.Name;
+
+            result.AddRange(columnNames.Select(c => new TableColumn<T>(c)));
+            return result;
+        }
+    }
+
+    public abstract class Model: IModel
+    {
+        public abstract string PrimaryKey{ get; }
 
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
@@ -25,29 +40,34 @@ namespace Api.DataStore
         public DateTime? UpdatedDate { get; set; }
         public int RemovedBy { get; set; }
         public DateTime? RemovedDate { get; set; }
+
+        public void SetProp(object prop)
+        {
+            GetType().GetProperty(prop.GetType().Name)?.SetValue(prop, this, null);
+        }
     }
 
-    public class Member : BaseModel, IModel
+    public class Member : Model
     {
-        public string PrimaryKey => nameof(MemberID);
+        public override string PrimaryKey => nameof(MemberID);
 
         public int MemberID { get; set; }
         public string LoginID { get; set; }
         public string UserName { get; set; }
     }
 
-    public class Org : BaseModel, IModel
+    public class Org : Model
     {
-        public string PrimaryKey => nameof(OrgID);
+        public override string PrimaryKey => nameof(OrgID);
 
         public int OrgID { get; set; }
         public string Name { get; set; }
         public int BillingID { get; set; }
     }
 
-    public class OrgBilling : BaseModel, IModel
+    public class OrgBilling : Model
     {
-        public string PrimaryKey => nameof(OrgBillingID);
+        public override string PrimaryKey => nameof(OrgBillingID);
 
         public int OrgBillingID { get; set; }
         public int OrgID { get; set; }
@@ -57,47 +77,50 @@ namespace Api.DataStore
         public int BillingYear { get; set; }
     }
 
-    public class OrgCc : BaseModel, IModel
+    public class OrgCc : Model
     {
-        public string PrimaryKey => nameof(OrgCCID);
+        public override string PrimaryKey => nameof(OrgCCID);
 
         public int OrgCCID { get; set; }
         public int OrgID { get; set; }
         public int CreditCardNumber { get; set; }
     }
 
-    public class OrgMember : BaseModel, IModel
+    public class OrgMember : Model
     {
-        public string PrimaryKey => nameof(OrgMemberID);
+        public override string PrimaryKey => nameof(OrgMemberID);
 
         public int OrgMemberID { get; set; }
         public int OrgID { get; set; }
         public int MemberID { get; set; }
     }
 
-    public class Tag : BaseModel, IModel
+    public class Tag : Model
     {
-        public string PrimaryKey => nameof(TagID);
+        public override string PrimaryKey => nameof(TagID);
 
         public int TagID { get; set; }
         public int Name { get; set; }
     }
 
-    public class OrgWork : BaseModel, IModel
+    public class OrgWork : Model
     {
-        public string PrimaryKey => nameof(OrgWorkID);
+        public override string PrimaryKey => nameof(OrgWorkID);
 
         public int OrgWorkID { get; set; }
         public int OrgID { get; set; }
         public int WorkID { get; set; }
     }
 
-    public class Work : BaseModel, IModel
+    public class Work : Model
     {
-        public string PrimaryKey => nameof(WorkID);
+        public override string PrimaryKey => nameof(WorkID);
+
+        public string OrgName { get; private set; }
 
         public int WorkID { get; set; }
         public int ParentWorkID { get; set; }
+        public int OrgID { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public int Owner { get; set; }
@@ -108,26 +131,26 @@ namespace Api.DataStore
         public DateTime CompleteDate { get; set; }
     }
 
-    public class WorkMember : BaseModel, IModel
+    public class WorkMember : Model
     {
-        public string PrimaryKey => nameof(WorkMemberID);
+        public override string PrimaryKey => nameof(WorkMemberID);
 
         public int WorkMemberID { get; set; }
         public int WorkID { get; set; }
     }
 
-    public class WorkTag : BaseModel, IModel
+    public class WorkTag : Model
     {
-        public string PrimaryKey => nameof(WorkTagID);
+        public override string PrimaryKey => nameof(WorkTagID);
 
         public int WorkTagID { get; set; }
         public int WorkID { get; set; }
         public int TagID { get; set; }
     }
 
-    public class WorkStatus : BaseModel, IModel
+    public class WorkStatus : Model
     {
-        public string PrimaryKey => nameof(WorkStatusID);
+        public override string PrimaryKey => nameof(WorkStatusID);
 
         public int WorkStatusID { get; set; }
         public int WorkID { get; set; }
