@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using System.Reflection;
 using Api.Extensions;
+using Dapper;
 
 namespace Api.DataStore
 {
@@ -146,14 +146,22 @@ namespace Api.DataStore
             return list;
         }
 
-        private object GetColumn(MySqlDataReader dr, string columnName)
+        private IEnumerable<T> Query<T>(string command, object parameters)
         {
-            for (var i = 0; i < dr.FieldCount; i++)
+            using (var db = new MySqlConnection(_settings.DB_Connection))
             {
-                if (dr.GetName(i).Equals(columnName, StringComparison.CurrentCultureIgnoreCase))
-                    return dr[i];
+                db.Open();
+                return db.Query(command, parameters).Cast<T>();
             }
-            return DBNull.Value;
+        }
+
+        public void Execute(string sql, object parameters)
+        {
+            using (var db = new MySqlConnection(_settings.DB_Connection))
+            {
+                db.Open();
+                db.Execute(sql, parameters);
+            }
         }
     }
 }
