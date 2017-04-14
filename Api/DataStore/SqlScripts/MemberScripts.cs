@@ -15,6 +15,6 @@
             ( `LoginID`,`UserName`,`CreatedBy`,`CreatedDate`,`UpdatedBy`,`UpdatedDate` )
             VALUES 
             ( @LoginID, @UserName, 0, NOW(), 0, NOW() );
-            SELECT CAST(SCOPE_IDENTITY() as int);";
+            SELECT LAST_INSERT_ID();";
     }
 }

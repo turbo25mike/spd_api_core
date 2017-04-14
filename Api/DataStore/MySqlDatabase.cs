@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 using Dapper;
 
@@ -19,7 +20,7 @@ namespace Api.DataStore
             using (var db = new MySqlConnection(_settings.DB_Connection))
             {
                 db.Open();
-                return db.Query<T>(sql, parameters).Single();
+                return db.Query<T>(Clean(sql), parameters).Single();
             }
         }
 
@@ -28,7 +29,7 @@ namespace Api.DataStore
             using (var db = new MySqlConnection(_settings.DB_Connection))
             {
                 db.Open();
-                return db.Query<T>(sql, parameters);
+                return db.Query<T>(Clean(sql), parameters);
             }
         }
 
@@ -37,8 +38,14 @@ namespace Api.DataStore
             using (var db = new MySqlConnection(_settings.DB_Connection))
             {
                 db.Open();
-                return db.Execute(sql, parameters);
+                return db.Execute(Clean(sql), parameters);
             }
+        }
+
+        private string Clean(string script)
+        {
+            var clean = Regex.Replace(script, @"\r\n?|\n", " ");
+            return clean;
         }
     }
 }

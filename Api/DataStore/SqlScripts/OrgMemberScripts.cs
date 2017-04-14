@@ -9,6 +9,6 @@
             ( `OrgID`,`MemberID`,`CreatedBy`,`CreatedDate`,`UpdatedBy`,`UpdatedDate` )
             VALUES
             ( @OrgID,@MemberID,@CreatedBy,NOW(),@UpdatedBy,NOW() );
-            SELECT CAST(SCOPE_IDENTITY() as int);";
+            SELECT LAST_INSERT_ID();";
     }
 }

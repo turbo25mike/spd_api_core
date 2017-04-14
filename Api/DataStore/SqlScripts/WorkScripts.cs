@@ -21,7 +21,7 @@
                 @ParentWorkID,@OrgID,@Title,@Description,@Owner,@Size,@Priority,@HoursWorked,@StartDate,@CompleteDate,
                 @CreatedBy,NOW(),@UpdatedBy,NOW()
             );
-            SELECT CAST(SCOPE_IDENTITY() as int);";
+            SELECT LAST_INSERT_ID();";
 
         public static string Update =
             @"UPDATE work

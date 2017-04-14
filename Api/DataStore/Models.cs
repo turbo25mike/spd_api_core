@@ -8,7 +8,7 @@ namespace Api.DataStore
         DateTime CreatedDate { get; set; }
         int UpdatedBy { get; set; }
         DateTime? UpdatedDate { get; set; }
-        int RemovedBy { get; set; }
+        int? RemovedBy { get; set; }
         DateTime? RemovedDate { get; set; }
     }
 
@@ -18,7 +18,7 @@ namespace Api.DataStore
         public DateTime CreatedDate { get; set; }
         public int UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public int RemovedBy { get; set; }
+        public int? RemovedBy { get; set; }
         public DateTime? RemovedDate { get; set; }
     }
 
@@ -33,7 +33,7 @@ namespace Api.DataStore
     {
         public int OrgID { get; set; }
         public string Name { get; set; }
-        public int BillingID { get; set; }
+        public int? BillingID { get; set; }
     }
 
     public class OrgBilling : Model

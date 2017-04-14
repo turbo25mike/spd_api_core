@@ -66,13 +66,14 @@ namespace Api
             var clientIDs = Environment.GetEnvironmentVariable("AUTH0_CLIENT_IDS") ?? Configuration["Auth0:ApiIdentifier"];
             var domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN") ?? Configuration["Auth0:Domain"];
 
+#if Release
             foreach (var id in clientIDs.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 app.UseJwtBearerAuthentication(new JwtBearerOptions
                 {
                     Audience = id,
                     Authority = domain
                 });
-
+#endif
             app.UseMvc();
         }
     }
