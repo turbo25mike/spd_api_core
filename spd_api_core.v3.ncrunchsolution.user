@@ -1,6 +1,6 @@
 ﻿<SolutionConfiguration>
   <Settings>
-    <AutoEnable>True</AutoEnable>
+    <AutoEnable>False</AutoEnable>
     <CurrentEngineMode>Run all tests automatically [Global]</CurrentEngineMode>
     <TestsWindowMenuOptions>
       <VerticalSplitMenuOption>false</VerticalSplitMenuOption>
@@ -9,6 +9,6 @@
       <ShowUnexecutedTestsMenuOption>true</ShowUnexecutedTestsMenuOption>
       <ShowIgnoredTestsMenuOption>false</ShowIgnoredTestsMenuOption>
     </TestsWindowMenuOptions>
-    <TestsWindowSplitterDistance>791</TestsWindowSplitterDistance>
+    <TestsWindowSplitterDistance>787</TestsWindowSplitterDistance>
   </Settings>
 </SolutionConfiguration>

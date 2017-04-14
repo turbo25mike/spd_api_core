@@ -1,6 +1,7 @@
 using System.Collections.Generic;
-using System.Linq;
 using Api.DataStore;
+using Api.DataStore.SqlScripts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -10,34 +11,39 @@ namespace Api.Controllers
     {
         public WorkController(IDatabase db) : base(db) { }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet]
-        [Route("root")]
-        public List<Work> GetWorkAtRootForMember()
+        [Route("")]
+        public IEnumerable<Work> GetWorkAtRootForMember()
         {
-            var memberOrgIds = DB.Select<OrgMember>(where: new Where { new WhereColumn<OrgMember>(nameof(OrgMember.MemberID), GetCurrentMember().MemberID) }).Select(mo => mo.OrgID).ToArray();
-            if (!memberOrgIds.Any()) return null;
-            var columns = ModelHelper.GetColumns<Work>();
-            columns.Add(new TableColumn<Org>(nameof(Org.Name)));
-            return DB.Select<Work>(
-                columns,
-                new Joins
-                    {
-                        new Join<Work, Org>(nameof(Work.OrgID), nameof(Org.OrgID))
-                    },
-                new Where
-                {
-                    new WhereColumn<Work>(nameof(Work.ParentWorkID), cmp: WhereComparer.Is, op: WhereOperator.And),
-                    new WhereColumns(
-                        new WhereItem[]
-                        {
-                            new WhereColumn<Work>(nameof(Work.OrgID), memberOrgIds, WhereOperator.Or),
-                            new WhereColumn<Work>(nameof(Work.Owner), GetCurrentMember().MemberID)
-                        }
-                        ,WhereOperator.And),
-                    new WhereColumn<Work>(nameof(Work.RemovedBy), cmp: WhereComparer.Is, op: WhereOperator.And),
-                    new WhereColumn<Org>(nameof(Org.RemovedBy), cmp: WhereComparer.Is)
-                });
+            return DB.Query<Work>(WorkScripts.GetActiveRootItems, new { GetCurrentMember().MemberID});
+        }
+
+        [Authorize]
+        [HttpPut]
+        [Route("")]
+        public void Put([FromBody] Work newItem)
+        {
+            newItem.UpdatedBy = GetCurrentMember().MemberID;
+            DB.Execute(WorkScripts.Update, newItem);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("")]
+        public int Post(Work newItem)
+        {
+            newItem.CreatedBy = GetCurrentMember().MemberID;
+            newItem.UpdatedBy = GetCurrentMember().MemberID;
+            return DB.QuerySingle<int>(WorkScripts.Insert, newItem);
+        }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("{id}")]
+        public void Delete(int id)
+        {
+            DB.Execute(WorkScripts.Insert, new {WorkID = id});
         }
     }
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
 using Api.DataStore;
+using Api.DataStore.SqlScripts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +14,30 @@ namespace Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("")]
-        public List<Org> GetMemberOrgs()
+        public IEnumerable<Org> GetMemberOrgs()
         {
-            var memberOrgs = DB.Select<OrgMember>(where: new Where {new WhereColumn<OrgMember>(nameof(OrgMember.MemberID), GetCurrentMember().MemberID)}).Select(mo => mo.OrgID).ToArray();
-            return memberOrgs.Any() ? DB.Select<Org>(where: new Where {new WhereColumn<OrgMember>(nameof(Org.OrgID), memberOrgs)}) : new List<Org>();
+            return DB.Query<Org>(OrgScripts.GetMemberOrgs, new {GetCurrentMember().MemberID});
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("")]
+        public int Post([FromBody] Org org)
+        {
+            org.CreatedBy = GetCurrentMember().MemberID;
+            org.UpdatedBy = GetCurrentMember().MemberID;
+            var orgId = DB.QuerySingle<int>(OrgScripts.Insert, org);
+            var orgMember = new OrgMember {MemberID = GetCurrentMember().MemberID, OrgID = orgId, CreatedBy = GetCurrentMember().MemberID, UpdatedBy = GetCurrentMember().MemberID};
+            return DB.QuerySingle<int>(OrgMemberScripts.Insert, orgMember);
+        }
+
+        [Authorize]
+        [HttpPut]
+        [Route("")]
+        public void Put([FromBody] Org org)
+        {
+            org.UpdatedBy = GetCurrentMember().MemberID;
+            DB.Execute(OrgScripts.Update, org);
         }
     }
 }

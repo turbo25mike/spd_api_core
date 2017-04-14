@@ -11,7 +11,6 @@ namespace Api.Tests
         [Fact]
         public void ShouldGetValue()
         {
-            WhenGetValue(_member.PrimaryKey).Should().Be(_member.MemberID);
             WhenGetValue(nameof(Member.MemberID)).Should().Be(_member.MemberID);
             WhenGetValue(nameof(Member.LoginID)).Should().Be(_member.LoginID);
             WhenGetValue(nameof(Member.UserName)).Should().Be(_member.UserName);

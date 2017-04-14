@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Reflection;
-using System.Linq;
 
 namespace Api.DataStore
 {
     public interface IModel
     {
-        string PrimaryKey { get; }
-
         int CreatedBy { get; set; }
         DateTime CreatedDate { get; set; }
         int UpdatedBy { get; set; }
@@ -16,41 +12,18 @@ namespace Api.DataStore
         DateTime? RemovedDate { get; set; }
     }
 
-    public static class ModelHelper
+    public class Model: IModel
     {
-        public static TableColumns GetColumns<T>()
-        {
-            var result = new TableColumns();
-            var columnNames = from prop in typeof(T).GetProperties()
-                              where prop.CanWrite && prop.Name != "RemovedBy" && prop.Name != "RemovedDate"
-                              select prop.Name;
-
-            result.AddRange(columnNames.Select(c => new TableColumn<T>(c)));
-            return result;
-        }
-    }
-
-    public abstract class Model: IModel
-    {
-        public abstract string PrimaryKey{ get; }
-
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
         public int RemovedBy { get; set; }
         public DateTime? RemovedDate { get; set; }
-
-        public void SetProp(object prop)
-        {
-            GetType().GetProperty(prop.GetType().Name)?.SetValue(prop, this, null);
-        }
     }
 
     public class Member : Model
     {
-        public override string PrimaryKey => nameof(MemberID);
-
         public int MemberID { get; set; }
         public string LoginID { get; set; }
         public string UserName { get; set; }
@@ -58,8 +31,6 @@ namespace Api.DataStore
 
     public class Org : Model
     {
-        public override string PrimaryKey => nameof(OrgID);
-
         public int OrgID { get; set; }
         public string Name { get; set; }
         public int BillingID { get; set; }
@@ -67,8 +38,6 @@ namespace Api.DataStore
 
     public class OrgBilling : Model
     {
-        public override string PrimaryKey => nameof(OrgBillingID);
-
         public int OrgBillingID { get; set; }
         public int OrgID { get; set; }
         public decimal AmountDue{ get; set; }
@@ -79,8 +48,6 @@ namespace Api.DataStore
 
     public class OrgCc : Model
     {
-        public override string PrimaryKey => nameof(OrgCCID);
-
         public int OrgCCID { get; set; }
         public int OrgID { get; set; }
         public int CreditCardNumber { get; set; }
@@ -88,8 +55,6 @@ namespace Api.DataStore
 
     public class OrgMember : Model
     {
-        public override string PrimaryKey => nameof(OrgMemberID);
-
         public int OrgMemberID { get; set; }
         public int OrgID { get; set; }
         public int MemberID { get; set; }
@@ -97,16 +62,12 @@ namespace Api.DataStore
 
     public class Tag : Model
     {
-        public override string PrimaryKey => nameof(TagID);
-
         public int TagID { get; set; }
         public int Name { get; set; }
     }
 
     public class OrgWork : Model
     {
-        public override string PrimaryKey => nameof(OrgWorkID);
-
         public int OrgWorkID { get; set; }
         public int OrgID { get; set; }
         public int WorkID { get; set; }
@@ -114,10 +75,7 @@ namespace Api.DataStore
 
     public class Work : Model
     {
-        public override string PrimaryKey => nameof(WorkID);
-
         public string OrgName { get; private set; }
-
         public int WorkID { get; set; }
         public int ParentWorkID { get; set; }
         public int OrgID { get; set; }
@@ -133,16 +91,12 @@ namespace Api.DataStore
 
     public class WorkMember : Model
     {
-        public override string PrimaryKey => nameof(WorkMemberID);
-
         public int WorkMemberID { get; set; }
         public int WorkID { get; set; }
     }
 
     public class WorkTag : Model
     {
-        public override string PrimaryKey => nameof(WorkTagID);
-
         public int WorkTagID { get; set; }
         public int WorkID { get; set; }
         public int TagID { get; set; }
@@ -150,8 +104,6 @@ namespace Api.DataStore
 
     public class WorkStatus : Model
     {
-        public override string PrimaryKey => nameof(WorkStatusID);
-
         public int WorkStatusID { get; set; }
         public int WorkID { get; set; }
         public string Description { get; set; }

@@ -42,7 +42,7 @@ namespace Api.Controllers
         [Route("db")]
         public string GetDBStatus()
         {
-            DB.Select<Org>(limit: 1);
+            //DB.QuerySingle<Member>();
             return "DB Looking Good!";
         }
     }

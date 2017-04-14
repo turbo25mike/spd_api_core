@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using Api.DataStore;
+using Api.DataStore.SqlScripts;
 using Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -57,20 +58,15 @@ namespace Api.Controllers
         [Route("")]
         public string Post([FromBody] Auth0User data)
         {
-            if (GetCurrentMember() != null)
-            {
-                var currentMember = GetCurrentMember();
+            var currentMember = GetCurrentMember();
+
+            if (currentMember == null)
+                DB.Execute(MemberScripts.Insert, new { LoginID = data.user_id, UserName = data.nickname });
+            else
+            { 
                 currentMember.LoginID = data.user_id;
                 currentMember.UserName = data.nickname;
-                DB.Update(currentMember, currentMember.MemberID, new[] {nameof(Member.LoginID), nameof(Member.UserName)});
-            }
-            else
-            {
-                DB.Insert(new Member
-                    {
-                        LoginID = data.user_id,
-                        UserName = data.nickname
-                    }, 0);
+                DB.Execute(MemberScripts.Update, new {currentMember.MemberID});
             }
 
             return $"Welcome, {data.nickname}";
