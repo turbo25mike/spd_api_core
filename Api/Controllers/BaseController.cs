@@ -16,7 +16,7 @@ namespace Api.Controllers
         public Member GetCurrentMember()
         {
 #if DEBUG
-            _currentMember = DB.QuerySingle<Member>(MemberScripts.GetMember, new { LoginID = "google-oauth2|113205226902327356570" });
+            _currentMember = DB.QuerySingle<Member>(MemberScripts.GetMember, new { LoginID = "testID" });
             return _currentMember;
 #endif
 
