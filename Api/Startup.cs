@@ -71,6 +71,9 @@ namespace Api
                 {
                     Audience = id,
                     Authority = domain
+#if DEBUG
+                    ,RequireHttpsMetadata = false
+#endif
                 });
             app.UseMvc();
         }

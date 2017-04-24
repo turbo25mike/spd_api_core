@@ -31,7 +31,7 @@ namespace Api.Controllers
         [Authorize]
         [HttpPost]
         [Route("")]
-        public int Post(Work newItem)
+        public int Post([FromBody] Work newItem)
         {
             newItem.CreatedBy = GetCurrentMember().MemberID;
             newItem.UpdatedBy = GetCurrentMember().MemberID;
