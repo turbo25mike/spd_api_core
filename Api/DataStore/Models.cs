@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Api.DataStore
 {
@@ -75,18 +76,25 @@ namespace Api.DataStore
 
     public class Work : Model
     {
+        public Work()
+        {
+            Children = new List<Work>();
+        }
+
         public string OrgName { get; private set; }
         public int WorkID { get; set; }
-        public int ParentWorkID { get; set; }
-        public int OrgID { get; set; }
+        public int? ParentWorkID { get; set; }
+        public int? OrgID { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public int Owner { get; set; }
-        public int Size { get; set; }
-        public int Priority { get; set; }
-        public double HoursWorked { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime CompleteDate { get; set; }
+        public int? Owner { get; set; }
+        public int? Size { get; set; }
+        public int? Priority { get; set; }
+        public double? HoursWorked { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? CompleteDate { get; set; }
+
+        public List<Work> Children { get; set; }
     }
 
     public class WorkMember : Model

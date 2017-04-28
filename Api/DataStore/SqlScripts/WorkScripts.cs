@@ -2,13 +2,18 @@
 {
     public static class WorkScripts
     {
-        public static string GetActiveRootItems = 
+        public static string GetActiveRootOrgItems = 
             @"SELECT * FROM org_member om
                 JOIN org o ON o.OrgID = om.OrgID AND o.RemovedDate IS NULL
                 LEFT JOIN work w ON w.OrgID = w.OrgID AND w.RemovedDate IS NULL AND w.CompleteDate IS NULL 
                 AND w.ParentWorkID is null 
                 JOIN work_member wm on wm.WorkID = w.WorkID AND wm.RemovedDate IS NULL AND wm.WorkID is not null
                 WHERE om.MemberID = @MemberID;";
+
+
+        public static string GetActiveRootUserItems =
+            @"SELECT * FROM work w
+                WHERE Owner = @Owner AND RemovedDate IS NULL AND CompleteDate IS NULL;";
 
         public static string Insert =
             @"INSERT INTO `spd`.`work`
