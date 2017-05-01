@@ -13,7 +13,7 @@
 
         public static string GetActiveRootUserItems =
             @"SELECT * FROM work w
-                WHERE Owner = @Owner AND RemovedDate IS NULL AND CompleteDate IS NULL;";
+                WHERE Owner = @Owner AND RemovedDate IS NULL;";
 
         public static string Insert =
             @"INSERT INTO `spd`.`work`

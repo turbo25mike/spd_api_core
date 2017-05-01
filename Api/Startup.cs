@@ -19,8 +19,6 @@ namespace Api
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
-
-            
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -37,6 +35,7 @@ namespace Api
                     .AllowAnyHeader()
                     .AllowCredentials());
             });
+
             // Add framework services.
             services.AddMvc();
 
@@ -75,6 +74,8 @@ namespace Api
                     ,RequireHttpsMetadata = false
 #endif
                 });
+
+
             app.UseMvc();
         }
     }
