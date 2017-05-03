@@ -64,7 +64,7 @@ namespace Api.DataStore
     public class Tag : Model
     {
         public int TagID { get; set; }
-        public int Name { get; set; }
+        public string Name { get; set; }
     }
 
     public class OrgWork : Model
@@ -108,6 +108,7 @@ namespace Api.DataStore
         public int WorkTagID { get; set; }
         public int WorkID { get; set; }
         public int TagID { get; set; }
+        public Tag Tag { get; set; }
     }
 
     public class WorkStatus : Model

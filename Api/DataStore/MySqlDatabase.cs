@@ -20,7 +20,7 @@ namespace Api.DataStore
             using (var db = new MySqlConnection(_settings.DB_Connection))
             {
                 db.Open();
-                return db.Query<T>(Clean(sql), parameters).Single();
+                return db.Query<T>(Clean(sql), parameters).FirstOrDefault();
             }
         }
 

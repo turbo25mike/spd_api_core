@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Api.DataStore;
@@ -35,6 +36,43 @@ namespace Api.Controllers
         {
             newItem.UpdatedBy = GetCurrentMember().MemberID;
             DB.Execute(WorkScripts.Update, newItem);
+        }
+
+        [Authorize]
+        [HttpPut]
+        [Route("{id}/tag/{tag}")]
+        public int PutTag(int id, string tag)
+        {
+            if (string.IsNullOrEmpty(tag))
+                throw new ArgumentNullException(nameof(tag));
+
+            var workTag = new WorkTag()
+                {
+                    WorkID = id,
+                    CreatedBy = GetCurrentMember().MemberID,
+                    UpdatedBy = GetCurrentMember().MemberID
+                };
+
+            var serverTag = DB.QuerySingle<Tag>(TagScripts.Get,new { Name = tag});
+            if (serverTag == null)
+            {
+                var newTag = new Tag()
+                    {
+                        Name = tag,
+                        CreatedBy = GetCurrentMember().MemberID,
+                        UpdatedBy = GetCurrentMember().MemberID
+                    };
+
+                var newTagID = DB.QuerySingle<int>(TagScripts.Insert, newTag);
+                workTag.TagID = newTagID;
+            }
+
+            var workTagFound = DB.QuerySingle<WorkTag>(WorkTagScripts.Get, workTag);
+
+            if (workTagFound != null)
+                throw new ArgumentOutOfRangeException();
+
+            return DB.QuerySingle<int>(WorkTagScripts.Insert, workTag);
         }
 
         [Authorize]
