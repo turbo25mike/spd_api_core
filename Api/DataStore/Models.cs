@@ -81,7 +81,7 @@ namespace Api.DataStore
             Children = new List<Work>();
         }
 
-        public string OrgName { get; private set; }
+        public string OrgName { get; set; }
         public int WorkID { get; set; }
         public int? ParentWorkID { get; set; }
         public int? OrgID { get; set; }
@@ -91,7 +91,7 @@ namespace Api.DataStore
         public int? Size { get; set; }
         public int? Priority { get; set; }
         public double? HoursWorked { get; set; }
-        public DateTime? StartDate { get; set; }
+        public DateTime? DueDate { get; set; }
         public DateTime? CompleteDate { get; set; }
 
         public List<Work> Children { get; set; }
@@ -109,6 +109,13 @@ namespace Api.DataStore
         public int WorkID { get; set; }
         public int TagID { get; set; }
         public Tag Tag { get; set; }
+    }
+    
+    public class WorkChat : Model
+    {
+        public int WorkChatID { get; set; }
+        public int WorkID { get; set; }
+        public string Message { get; set; }
     }
 
     public class WorkStatus : Model

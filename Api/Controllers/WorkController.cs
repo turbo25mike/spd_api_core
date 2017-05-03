@@ -23,10 +23,41 @@ namespace Api.Controllers
 
         [Authorize]
         [HttpGet]
+        [Route("{id}/details")]
+        public Work GetWorkDetails(int id)
+        {
+            return DB.QuerySingle<Work>(WorkScripts.GetByMemberIDAndWorkID, new { WorkID = id, MemberID = GetCurrentMember().MemberID });
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("{id}/chat")]
+        public IEnumerable<WorkChat> GetWorkChat(int id)
+        {
+            return DB.Query<WorkChat>(WorkChatScripts.GetChatByMemberIDAndWorkID, new { WorkID = id, MemberID = GetCurrentMember().MemberID });
+        }
+
+        [Authorize]
+        [HttpGet]
         [Route("org")]
         public IEnumerable<Work> GetWorkAtRootForOrg()
         {
             return DB.Query<Work>(WorkScripts.GetActiveRootOrgItems, new { GetCurrentMember().MemberID });
+        }
+
+        [Authorize]
+        [HttpPut]
+        [Route("{id}/chat")]
+        public void Put(int id, [FromBody] string newMessage)
+        {
+            var newItem = new WorkChat()
+                {
+                    CreatedBy = GetCurrentMember().MemberID,
+                    UpdatedBy = GetCurrentMember().MemberID,
+                    Message = newMessage,
+                    WorkID = id
+                };
+            DB.Execute(WorkChatScripts.Insert, newItem);
         }
 
         [Authorize]
