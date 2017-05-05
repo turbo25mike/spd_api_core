@@ -23,7 +23,7 @@ namespace Api.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("{id}/details")]
+        [Route("{id}")]
         public Work GetWorkDetails(int id)
         {
             return DB.QuerySingle<Work>(WorkScripts.GetByMemberIDAndWorkID, new { WorkID = id, MemberID = GetCurrentMember().MemberID });

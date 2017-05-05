@@ -5,9 +5,9 @@
 
         public static string GetByMemberIDAndWorkID =
             @"SELECT * FROM work w
-                JOIN work_member wm on wm.WorkID = w.WorkID AND wm.RemovedDate IS NULL AND wm.WorkID is not null AND wm.MemberID = @MemberID
-                JOIN work_status ws on wm.WorkID = w.WorkID AND wm.RemovedDate IS NULL
-                WHERE om.WorkID = @WorkID;";
+                JOIN work_member wm on wm.WorkID = w.WorkID AND wm.RemovedDate IS NULL AND wm.MemberID = @MemberID
+                LEFT JOIN work_status ws on wm.WorkID = w.WorkID AND wm.RemovedDate IS NULL
+                WHERE w.WorkID = @WorkID;";
 
         public static string GetActiveRootOrgItems = 
             @"SELECT * FROM org_member om
