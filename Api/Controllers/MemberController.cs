@@ -20,7 +20,7 @@ namespace Api.Controllers
         {
             return $"Welcome, {GetCurrentMember().UserName}!";
         }
-    
+
         [Authorize]
         [HttpGet]
         [Route("identity")]

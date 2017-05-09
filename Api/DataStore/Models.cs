@@ -31,6 +31,7 @@ namespace Api.DataStore
         public int MemberID { get; set; }
         public string LoginID { get; set; }
         public string UserName { get; set; }
+        public string Picture { get; set; }
     }
 
     public class MemberForecast : Model
