@@ -15,10 +15,13 @@ namespace Api.DataStore
 
     public class Model: IModel
     {
+        public string CreatedByName { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string UpdatedByName { get; set; }
         public int UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
+        public string RemovedByName { get; set; }
         public int? RemovedBy { get; set; }
         public DateTime? RemovedDate { get; set; }
     }
@@ -28,6 +31,14 @@ namespace Api.DataStore
         public int MemberID { get; set; }
         public string LoginID { get; set; }
         public string UserName { get; set; }
+    }
+
+    public class MemberForecast : Model
+    {
+        public int MemberForecastID { get; set; }
+        public int WorkID { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 
     public class Org : Model
@@ -54,6 +65,16 @@ namespace Api.DataStore
         public int CreditCardNumber { get; set; }
     }
 
+    public class OrgGoal : Model
+    {
+        public int OrgGoalID { get; set; }
+        public int OrgID { get; set; }
+        public int ParentOrgGoalID { get; set; }
+        public string Goal { get; set; }
+        public bool BasedOnWork { get; set; }
+        public int SuccessPercentCriteria { get; set; }
+    }
+
     public class OrgMember : Model
     {
         public int OrgMemberID { get; set; }
@@ -61,10 +82,11 @@ namespace Api.DataStore
         public int MemberID { get; set; }
     }
 
-    public class Tag : Model
+    public class OrgRole : Model
     {
-        public int TagID { get; set; }
-        public string Name { get; set; }
+        public int OrgRoleID { get; set; }
+        public int OrgID { get; set; }
+        public string Role { get; set; }
     }
 
     public class OrgWork : Model
@@ -88,6 +110,7 @@ namespace Api.DataStore
         public string Title { get; set; }
         public string Description { get; set; }
         public int? Owner { get; set; }
+        public string Status { get; set; }
         public int? Size { get; set; }
         public int? Priority { get; set; }
         public double? HoursWorked { get; set; }
@@ -95,33 +118,43 @@ namespace Api.DataStore
         public DateTime? CompleteDate { get; set; }
 
         public List<Work> Children { get; set; }
+        public List<WorkTag> Tags { get; set; }
     }
 
     public class WorkMember : Model
     {
         public int WorkMemberID { get; set; }
         public int WorkID { get; set; }
+        public int OrgRoleID { get; set; }
+        public int MemberID { get; set; }
     }
 
     public class WorkTag : Model
     {
         public int WorkTagID { get; set; }
         public int WorkID { get; set; }
-        public int TagID { get; set; }
-        public Tag Tag { get; set; }
+        public string TagName { get; set; }
+        public string TagValue { get; set; }
     }
-    
+
+
+    public class Ticket : Model
+    {
+        public int TicketID { get; set; }
+        public int WorkID { get; set; }
+    }
+
+    public class TicketChat : Model
+    {
+        public int TicketChatID { get; set; }
+        public int TicketID { get; set; }
+        public string Message { get; set; }
+    }
+
     public class WorkChat : Model
     {
         public int WorkChatID { get; set; }
         public int WorkID { get; set; }
         public string Message { get; set; }
-    }
-
-    public class WorkStatus : Model
-    {
-        public int WorkStatusID { get; set; }
-        public int WorkID { get; set; }
-        public string Description { get; set; }
     }
 }

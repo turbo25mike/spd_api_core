@@ -18,7 +18,9 @@ namespace Api.Controllers
         [Route("")]
         public IEnumerable<Work> GetWorkAtRootForMember()
         {
-            return ConvertToHierarchy(DB.Query<Work>(WorkScripts.GetActiveRootUserItems, new { Owner = GetCurrentMember().MemberID }));
+            var myWorkList = ConvertToHierarchy(DB.Query<Work>(WorkScripts.GetMyActiveRootItems, new { Owner = GetCurrentMember().MemberID }));
+            var orgWorkList = ConvertToHierarchy(DB.Query<Work>(WorkScripts.GetActiveRootOrgItems, new { MemberID = GetCurrentMember().MemberID }));
+            return myWorkList.Union(orgWorkList);
         }
 
         [Authorize]
@@ -26,7 +28,9 @@ namespace Api.Controllers
         [Route("{id}")]
         public Work GetWorkDetails(int id)
         {
-            return DB.QuerySingle<Work>(WorkScripts.GetByMemberIDAndWorkID, new { WorkID = id, MemberID = GetCurrentMember().MemberID });
+            var result = DB.QuerySingle<Work>(WorkScripts.GetByMemberIDAndWorkID, new { WorkID = id, GetCurrentMember().MemberID });
+            result.Tags = DB.Query<WorkTag>(WorkTagScripts.GetByWorkID, new { WorkID = id }).ToList();
+            return result;
         }
 
         [Authorize]
@@ -51,12 +55,12 @@ namespace Api.Controllers
         public void Put(int id, [FromBody] string newMessage)
         {
             var newItem = new WorkChat()
-                {
-                    CreatedBy = GetCurrentMember().MemberID,
-                    UpdatedBy = GetCurrentMember().MemberID,
-                    Message = newMessage,
-                    WorkID = id
-                };
+            {
+                CreatedBy = GetCurrentMember().MemberID,
+                UpdatedBy = GetCurrentMember().MemberID,
+                Message = newMessage,
+                WorkID = id
+            };
             DB.Execute(WorkChatScripts.Insert, newItem);
         }
 
@@ -71,39 +75,23 @@ namespace Api.Controllers
 
         [Authorize]
         [HttpPut]
-        [Route("{id}/tag/{tag}")]
-        public int PutTag(int id, string tag)
+        [Route("{id}/tag")]
+        public int PutTag(int id, [FromBody] WorkTag tag)
         {
-            if (string.IsNullOrEmpty(tag))
+            if (tag == null)
                 throw new ArgumentNullException(nameof(tag));
 
-            var workTag = new WorkTag()
-                {
-                    WorkID = id,
-                    CreatedBy = GetCurrentMember().MemberID,
-                    UpdatedBy = GetCurrentMember().MemberID
-                };
+            tag.WorkID = id;
+            tag.CreatedBy = GetCurrentMember().MemberID;
+            tag.UpdatedBy = GetCurrentMember().MemberID;
 
-            var serverTag = DB.QuerySingle<Tag>(TagScripts.Get,new { Name = tag});
+            var serverTag = DB.QuerySingle<WorkTag>(WorkTagScripts.GetByWorkIDAndTagName, tag);
             if (serverTag == null)
-            {
-                var newTag = new Tag()
-                    {
-                        Name = tag,
-                        CreatedBy = GetCurrentMember().MemberID,
-                        UpdatedBy = GetCurrentMember().MemberID
-                    };
+                return DB.QuerySingle<int>(WorkTagScripts.Insert, tag);
 
-                var newTagID = DB.QuerySingle<int>(TagScripts.Insert, newTag);
-                workTag.TagID = newTagID;
-            }
-
-            var workTagFound = DB.QuerySingle<WorkTag>(WorkTagScripts.Get, workTag);
-
-            if (workTagFound != null)
-                throw new ArgumentOutOfRangeException();
-
-            return DB.QuerySingle<int>(WorkTagScripts.Insert, workTag);
+            serverTag.TagValue = tag.TagValue;
+            DB.Execute(WorkTagScripts.Update, serverTag);
+            return serverTag.WorkTagID;
         }
 
         [Authorize]
