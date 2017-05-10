@@ -8,17 +8,16 @@
                 JOIN work_member wm on wm.WorkID = w.WorkID AND wm.RemovedDate IS NULL AND wm.MemberID = @MemberID
                 WHERE w.WorkID = @WorkID;";
 
-        public static string GetActiveRootOrgItems = 
+        public static string GetActiveOrgItems = 
             @"SELECT w.WorkID, w.ParentWorkID, w.OrgID, w.Title FROM org_member om
                 JOIN org o ON o.OrgID = om.OrgID AND o.RemovedDate IS NULL
                 LEFT JOIN work w ON w.OrgID = w.OrgID AND w.RemovedDate IS NULL AND w.CompleteDate IS NULL 
-                AND w.ParentWorkID is null 
                 JOIN work_member wm on wm.WorkID = w.WorkID AND wm.RemovedDate IS NULL AND wm.WorkID is not null
                 WHERE om.MemberID = @MemberID;";
 
-        public static string GetMyActiveRootItems =
+        public static string GetMyActiveItems =
             @"SELECT WorkID, ParentWorkID, OrgID, Title FROM work 
-                WHERE Owner = @Owner AND ParentWorkID IS NULL AND CompleteDate IS NULL AND RemovedDate IS NULL;";
+                WHERE Owner = @Owner AND CompleteDate IS NULL AND RemovedDate IS NULL;";
         
         public static string Insert =
             @"INSERT INTO `spd`.`work`

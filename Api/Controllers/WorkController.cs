@@ -18,9 +18,7 @@ namespace Api.Controllers
         [Route("")]
         public IEnumerable<Work> GetWorkAtRootForMember()
         {
-            var myWorkList = ConvertToHierarchy(DB.Query<Work>(WorkScripts.GetMyActiveRootItems, new { Owner = GetCurrentMember().MemberID }));
-            var orgWorkList = ConvertToHierarchy(DB.Query<Work>(WorkScripts.GetActiveRootOrgItems, new { MemberID = GetCurrentMember().MemberID }));
-            return myWorkList.Union(orgWorkList);
+            return ConvertToHierarchy(DB.Query<Work>(WorkScripts.GetMyActiveItems, new { Owner = GetCurrentMember().MemberID }));
         }
 
         [Authorize]
@@ -46,7 +44,7 @@ namespace Api.Controllers
         [Route("org")]
         public IEnumerable<Work> GetWorkAtRootForOrg()
         {
-            return DB.Query<Work>(WorkScripts.GetActiveRootOrgItems, new { GetCurrentMember().MemberID });
+            return DB.Query<Work>(WorkScripts.GetActiveOrgItems, new { GetCurrentMember().MemberID });
         }
 
         [Authorize]
