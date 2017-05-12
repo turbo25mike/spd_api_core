@@ -1,6 +1,7 @@
 using Api.DataStore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace Api.Controllers
 {
@@ -9,7 +10,7 @@ namespace Api.Controllers
     {
         private readonly IAppSettings _appSettings;
 
-        public StatusController(IDatabase db, IAppSettings settings) : base(db)
+        public StatusController(IDatabase db, IAppSettings settings) : base(db, settings)
         {
             _appSettings = settings;
         }

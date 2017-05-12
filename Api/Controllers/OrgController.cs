@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Api.DataStore;
 using Api.DataStore.SqlScripts;
 using Microsoft.AspNetCore.Authorization;
@@ -9,34 +10,37 @@ namespace Api.Controllers
     [Route("api/org")]
     public class OrgController : BaseController
     {
-        public OrgController(IDatabase db) : base(db) { }
+        public OrgController(IDatabase db, IAppSettings settings) : base(db, settings) { }
 
         [Authorize]
         [HttpGet]
         [Route("")]
-        public IEnumerable<Org> GetMemberOrgs()
+        public async Task<IEnumerable<Org>> GetMemberOrgs()
         {
-            return DB.Query<Org>(OrgScripts.GetMemberOrgs, new {GetCurrentMember().MemberID});
+            var currentMember = await GetCurrentMember();
+            return DB.Query<Org>(OrgScripts.GetMemberOrgs, new { currentMember.MemberID});
         }
 
         [Authorize]
         [HttpPost]
         [Route("")]
-        public int Post([FromBody] Org org)
+        public async Task<int> Post([FromBody] Org org)
         {
-            org.CreatedBy = GetCurrentMember().MemberID;
-            org.UpdatedBy = GetCurrentMember().MemberID;
+            var currentMember = await GetCurrentMember();
+            org.CreatedBy = currentMember.MemberID;
+            org.UpdatedBy = currentMember.MemberID;
             var orgId = DB.QuerySingle<int>(OrgScripts.Insert, org);
-            var orgMember = new OrgMember {MemberID = GetCurrentMember().MemberID, OrgID = orgId, CreatedBy = GetCurrentMember().MemberID, UpdatedBy = GetCurrentMember().MemberID};
+            var orgMember = new OrgMember {MemberID = currentMember.MemberID, OrgID = orgId, CreatedBy = currentMember.MemberID, UpdatedBy = currentMember.MemberID};
             return DB.QuerySingle<int>(OrgMemberScripts.Insert, orgMember);
         }
 
         [Authorize]
         [HttpPut]
         [Route("")]
-        public void Put([FromBody] Org org)
+        public async void Put([FromBody] Org org)
         {
-            org.UpdatedBy = GetCurrentMember().MemberID;
+            var currentMember = await GetCurrentMember();
+            org.UpdatedBy = currentMember.MemberID;
             DB.Execute(OrgScripts.Update, org);
         }
     }

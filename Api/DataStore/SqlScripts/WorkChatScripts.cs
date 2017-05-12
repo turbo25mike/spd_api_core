@@ -4,8 +4,9 @@
     {
 
         public static string GetChatByMemberIDAndWorkID =
-            @"SELECT * FROM `spd`.`work_chat` wc
+            @"SELECT wm.*, m.UserName as 'UpdatedByName' FROM `spd`.`work_chat` wc
                 LEFT JOIN work_member wm on wm.WorkID = wc.WorkID AND wm.RemovedDate IS NULL
+                LEFT JOIN member m on m.MemberID = wc.UpdatedBy
                 WHERE wc.WorkID = @WorkID AND wm.MemberID = @MemberID;";
 
         public static string Insert =

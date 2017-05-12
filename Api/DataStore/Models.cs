@@ -30,8 +30,13 @@ namespace Api.DataStore
     {
         public int MemberID { get; set; }
         public string LoginID { get; set; }
-        public string UserName { get; set; }
+        public string Nickname { get; set; }
         public string Picture { get; set; }
+        public string Email { get; set; }
+        public bool EmailVerified { get; set; }
+        public string GivenName { get; set; }
+        public string FamilyName { get; set; }
+        public string Name { get; set; }
     }
 
     public class MemberForecast : Model

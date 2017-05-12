@@ -1,32 +1,37 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Api.DataStore;
 using Api.DataStore.SqlScripts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace Api.Controllers
 {
     [Route("api/work")]
     public class WorkController : BaseController
     {
-        public WorkController(IDatabase db) : base(db) { }
+        public WorkController(IDatabase db, IAppSettings settings) : base(db, settings) { }
 
         [Authorize]
         [HttpGet]
         [Route("")]
-        public IEnumerable<Work> GetWorkAtRootForMember()
+        public async Task<IEnumerable<Work>> GetWorkAtRootForMember()
         {
-            return ConvertToHierarchy(DB.Query<Work>(WorkScripts.GetMyActiveItems, new { Owner = GetCurrentMember().MemberID }));
+            var currentMember = await GetCurrentMember();
+            return ConvertToHierarchy(DB.Query<Work>(WorkScripts.GetMyActiveItems, new { Owner = currentMember.MemberID }));
         }
 
         [Authorize]
         [HttpGet]
         [Route("{id}")]
-        public Work GetWorkDetails(int id)
+        public async Task<Work> GetWorkDetails(int id)
         {
-            var result = DB.QuerySingle<Work>(WorkScripts.GetByMemberIDAndWorkID, new { WorkID = id, GetCurrentMember().MemberID });
+            var currentMember = await GetCurrentMember();
+            var result = DB.QuerySingle<Work>(WorkScripts.GetByMemberIDAndWorkID, new { WorkID = id, currentMember.MemberID });
             result.Tags = DB.Query<WorkTag>(WorkTagScripts.GetByWorkID, new { WorkID = id }).ToList();
             return result;
         }
@@ -34,28 +39,31 @@ namespace Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("{id}/chat")]
-        public IEnumerable<WorkChat> GetWorkChat(int id)
+        public async Task<IEnumerable<WorkChat>> GetWorkChat(int id)
         {
-            return DB.Query<WorkChat>(WorkChatScripts.GetChatByMemberIDAndWorkID, new { WorkID = id, MemberID = GetCurrentMember().MemberID });
+            var currentMember = await GetCurrentMember();
+            return DB.Query<WorkChat>(WorkChatScripts.GetChatByMemberIDAndWorkID, new { WorkID = id, MemberID = currentMember.MemberID });
         }
 
         [Authorize]
         [HttpGet]
         [Route("org")]
-        public IEnumerable<Work> GetWorkAtRootForOrg()
+        public async Task<IEnumerable<Work>> GetWorkAtRootForOrg()
         {
-            return DB.Query<Work>(WorkScripts.GetActiveOrgItems, new { GetCurrentMember().MemberID });
+            var currentMember = await GetCurrentMember();
+            return DB.Query<Work>(WorkScripts.GetActiveOrgItems, new { currentMember.MemberID });
         }
 
         [Authorize]
         [HttpPut]
         [Route("{id}/chat")]
-        public void Put(int id, [FromBody] string newMessage)
+        public async void Put(int id, [FromBody] string newMessage)
         {
+            var currentMember = await GetCurrentMember();
             var newItem = new WorkChat()
             {
-                CreatedBy = GetCurrentMember().MemberID,
-                UpdatedBy = GetCurrentMember().MemberID,
+                CreatedBy = currentMember.MemberID,
+                UpdatedBy = currentMember.MemberID,
                 Message = newMessage,
                 WorkID = id
             };
@@ -65,23 +73,25 @@ namespace Api.Controllers
         [Authorize]
         [HttpPut]
         [Route("")]
-        public void Put([FromBody] Work newItem)
+        public async void Put([FromBody] Work newItem)
         {
-            newItem.UpdatedBy = GetCurrentMember().MemberID;
+            var currentMember = await GetCurrentMember();
+            newItem.UpdatedBy = currentMember.MemberID;
             DB.Execute(WorkScripts.Update, newItem);
         }
 
         [Authorize]
         [HttpPut]
         [Route("{id}/tag")]
-        public int PutTag(int id, [FromBody] WorkTag tag)
+        public async Task<int> PutTag(int id, [FromBody] WorkTag tag)
         {
+            var currentMember = await GetCurrentMember();
             if (tag == null)
                 throw new ArgumentNullException(nameof(tag));
 
             tag.WorkID = id;
-            tag.CreatedBy = GetCurrentMember().MemberID;
-            tag.UpdatedBy = GetCurrentMember().MemberID;
+            tag.CreatedBy = currentMember.MemberID;
+            tag.UpdatedBy = currentMember.MemberID;
 
             var serverTag = DB.QuerySingle<WorkTag>(WorkTagScripts.GetByWorkIDAndTagName, tag);
             if (serverTag == null)
@@ -95,11 +105,12 @@ namespace Api.Controllers
         [Authorize]
         [HttpPost]
         [Route("")]
-        public int Post([FromBody] Work newItem)
+        public async Task<int> Post([FromBody] Work newItem)
         {
-            newItem.Owner = GetCurrentMember().MemberID;
-            newItem.CreatedBy = GetCurrentMember().MemberID;
-            newItem.UpdatedBy = GetCurrentMember().MemberID;
+            var currentMember = await GetCurrentMember();
+            newItem.Owner = currentMember.MemberID;
+            newItem.CreatedBy = currentMember.MemberID;
+            newItem.UpdatedBy = currentMember.MemberID;
             return DB.QuerySingle<int>(WorkScripts.Insert, newItem);
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Api.DataStore;
 using Api.DataStore.SqlScripts;
 using Api.Models;
@@ -11,14 +12,15 @@ namespace Api.Controllers
     [Route("api/member")]
     public class MemberController : BaseController
     {
-        public MemberController(IDatabase db) : base(db) {}
+        public MemberController(IDatabase db, IAppSettings settings) : base(db, settings) {}
 
         [Authorize]
         [HttpGet]
         [Route("")]
-        public string GetMemberName()
+        public async Task<string> GetMemberName()
         {
-            return $"Welcome, {GetCurrentMember().UserName}!";
+            var member = await GetCurrentMember();
+            return $"Welcome, {member.Nickname}!";
         }
 
         [Authorize]
@@ -56,20 +58,19 @@ namespace Api.Controllers
         [Authorize]
         [HttpPost]
         [Route("")]
-        public string Post([FromBody] Auth0User data)
+        public async void Post([FromBody] Auth0User data)
         {
-            var currentMember = GetCurrentMember();
+            var currentMember = await GetCurrentMember() ?? new Member();
+            currentMember.LoginID = data.user_id;
+            currentMember.Nickname = data.nickname;
+            currentMember.Picture = data.picture;
+            currentMember.Name = data.name;
+            currentMember.GivenName = data.given_name;
+            currentMember.FamilyName = data.family_name;
+            currentMember.Email = data.email;
+            currentMember.EmailVerified = data.email_verified;
 
-            if (currentMember == null)
-                DB.Execute(MemberScripts.Insert, new { LoginID = data.user_id, UserName = data.nickname });
-            else
-            { 
-                currentMember.LoginID = data.user_id;
-                currentMember.UserName = data.nickname;
-                DB.Execute(MemberScripts.Update, new {currentMember.MemberID});
-            }
-
-            return $"Welcome, {data.nickname}";
+            DB.Execute(currentMember.MemberID > 0 ? MemberScripts.Insert : MemberScripts.Update, currentMember);
         }
     }
 }

@@ -1,4 +1,7 @@
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Api.DataStore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -39,6 +42,7 @@ namespace Api
             // Add framework services.
             services.AddMvc();
 
+
             ConfigureAppSettings(services);
         }
 
@@ -48,8 +52,10 @@ namespace Api
             {
                 DB_Connection = Environment.GetEnvironmentVariable("APP_DB_CONNECTION") ?? Configuration["App:DB_Connection"],
                 Auth0_Domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN") ?? Configuration["Auth0:Domain"],
+                Auth0_Identifier = Environment.GetEnvironmentVariable("AUTH0_CLIENT_IDS") ?? Configuration["Auth0:ApiIdentifier"],
                 Environment = Environment.GetEnvironmentVariable("APP_ENVIRONMENT") ?? Configuration["App:Environment"]
             });
+
 
             services.AddTransient<IDatabase, MySqlDatabase>();
         }
@@ -73,6 +79,15 @@ namespace Api
 #if DEBUG
                     ,RequireHttpsMetadata = false
 #endif
+                    ,Events = new JwtBearerEvents
+                        {
+                        OnTokenValidated = context =>
+                        {
+                            if (context.SecurityToken is JwtSecurityToken token && context.Ticket.Principal.Identity is ClaimsIdentity identity)
+                                identity.AddClaim(new Claim("access_token", token.RawData));
+                            return Task.FromResult(0);
+                        }
+                    }
                 });
 
 
