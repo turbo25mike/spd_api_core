@@ -1,7 +1,6 @@
 using Api.DataStore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 
 namespace Api.Controllers
 {
@@ -22,13 +21,13 @@ namespace Api.Controllers
             return "Service Looking Good!";
         }
 
-        [Authorize]
-        [HttpGet]
-        [Route("auth")]
-        public string GetAuth0Domain()
-        {
-            return _appSettings.Auth0_Domain;
-        }
+        //[Authorize]
+        //[HttpGet]
+        //[Route("auth")]
+        //public string GetAuth0Domain()
+        //{
+        //    return _appSettings.Auth0_Domain;
+        //}
 
         [Authorize]
         [HttpGet]

@@ -12,17 +12,18 @@
         
         public static string Insert =
             @"INSERT INTO work_tag
-            ( WorkID,TagName,TagValue,
+            ( WorkID,Title,`Value`,Color,
             CreatedBy,CreatedDate,UpdatedBy,UpdatedDate )
             VALUES
-            ( @WorkID, @TagName, @TagValue, @CreatedBy, NOW(), @UpdatedBy, NOW() );
+            ( @WorkID, @Title, @Value, @Color, @CreatedBy, NOW(), @UpdatedBy, NOW() );
             SELECT LAST_INSERT_ID();";
         
         public static string Update =
             @"UPDATE work_tag
             SET
-            `TagName` = @TagName,
-            `TagValue` = @TagValue,
+            `Title` = @Title,
+            `Value` = @Value,
+            `Color` = @Color,
             `UpdatedBy` = @UpdatedBy,
             `UpdatedDate` = NOW()
             WHERE `WorkTagID` = @WorkTagID;";

@@ -16,13 +16,10 @@ namespace Api.DataStore
 
     public class Model: IModel
     {
-        public string CreatedByName { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
-        public string UpdatedByName { get; set; }
         public int UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public string RemovedByName { get; set; }
         public int? RemovedBy { get; set; }
         public DateTime? RemovedDate { get; set; }
     }
@@ -128,7 +125,7 @@ namespace Api.DataStore
         public int? OrgID { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public int? Owner { get; set; }
+        public int? OwnerID { get; set; }
         public string Status { get; set; }
         public int? Size { get; set; }
         public int? Priority { get; set; }
@@ -152,8 +149,9 @@ namespace Api.DataStore
     {
         public int WorkTagID { get; set; }
         public int WorkID { get; set; }
-        public string TagName { get; set; }
-        public string TagValue { get; set; }
+        public string Title { get; set; }
+        public string Value { get; set; }
+        public string Color { get; set; }
     }
 
 

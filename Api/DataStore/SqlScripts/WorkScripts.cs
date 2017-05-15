@@ -17,17 +17,17 @@
 
         public static string GetMyActiveItems =
             @"SELECT WorkID, ParentWorkID, OrgID, Title FROM work 
-                WHERE Owner = @Owner AND CompleteDate IS NULL AND RemovedDate IS NULL;";
+                WHERE OwnerID = @Owner AND CompleteDate IS NULL AND RemovedDate IS NULL;";
         
         public static string Insert =
             @"INSERT INTO `spd`.`work`
             (
-                `ParentWorkID`,`OrgID`,`Title`,`Description`,`Owner`,`Size`,`Priority`,`HoursWorked`,`DueDate`,
+                `ParentWorkID`,`OrgID`,`Title`,`Description`,`OwnerID`,`Size`,`Priority`,`HoursWorked`,`DueDate`,
                 `CompleteDate`,`CreatedBy`,`CreatedDate`,`UpdatedBy`,`UpdatedDate`
             )
             VALUES
             (
-                @ParentWorkID,@OrgID,@Title,@Description,@Owner,@Size,@Priority,@HoursWorked,@DueDate,@CompleteDate,
+                @ParentWorkID,@OrgID,@Title,@Description,@OwnerID,@Size,@Priority,@HoursWorked,@DueDate,@CompleteDate,
                 @CreatedBy,NOW(),@UpdatedBy,NOW()
             );
             SELECT LAST_INSERT_ID();";
