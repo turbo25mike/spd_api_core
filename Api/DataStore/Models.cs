@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Api.Models;
+using System;
 using System.Collections.Generic;
 
 namespace Api.DataStore
@@ -37,6 +38,18 @@ namespace Api.DataStore
         public string GivenName { get; set; }
         public string FamilyName { get; set; }
         public string Name { get; set; }
+
+        public void Map(Auth0User auth)
+        {
+            Nickname = auth.nickname;
+            Picture = auth.picture;
+            Email = auth.email;
+            EmailVerified = auth.email_verified;
+            GivenName = auth.given_name;
+            FamilyName = auth.family_name;
+            Name = auth.name;
+            LoginID = auth.user_id;
+        }
     }
 
     public class MemberForecast : Model
