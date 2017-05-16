@@ -1,49 +1,26 @@
-using Api.DataStore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 
 namespace Api.Controllers
 {
     [Route("api/status")]
     public class StatusController : BaseController
     {
-        private readonly IAppSettings _appSettings;
+        private readonly IAppSettings _settings;
 
-        public StatusController(IDatabase db, IAppSettings settings) : base(db, settings)
+        public StatusController(IAppSettings settings)
         {
-            _appSettings = settings;
+            _settings = settings;
         }
 
         [HttpGet]
         [Route("")]
-        public string Get()
-        {
-            return "Service Looking Good!";
-        }
-
-        //[Authorize]
-        //[HttpGet]
-        //[Route("auth")]
-        //public string GetAuth0Domain()
-        //{
-        //    return _appSettings.Auth0_Domain;
-        //}
+        public string Get() => "Service Looking Good!";
 
         [Authorize]
         [HttpGet]
         [Route("environment")]
-        public string GetEnvironment()
-        {
-            return _appSettings.Environment;
-        }
-
-        [Authorize]
-        [HttpGet]
-        [Route("db")]
-        public string GetDBStatus()
-        {
-            //DB.QuerySingle<Member>();
-            return "DB Looking Good!";
-        }
+        public string GetEnvironment() => _settings.Environment;
     }
 }

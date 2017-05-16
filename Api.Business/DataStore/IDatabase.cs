@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Api.DataStore
+namespace Business.DataStore
 {
     public interface IDatabase
     {

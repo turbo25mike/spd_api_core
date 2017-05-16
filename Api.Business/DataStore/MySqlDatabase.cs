@@ -1,23 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using MySql.Data.MySqlClient;
 using Dapper;
+using Models;
+using MySql.Data.MySqlClient;
 
-namespace Api.DataStore
+namespace Business.DataStore
 {
     public class MySqlDatabase : IDatabase
     {
-        private readonly IAppSettings _settings;
+        private readonly string _dbConnection;
 
         public MySqlDatabase(IAppSettings settings)
         {
-            _settings = settings;
+            _dbConnection = settings.DB_Connection;
         }
 
         public T QuerySingle<T>(string sql, object parameters)
         {
-            using (var db = new MySqlConnection(_settings.DB_Connection))
+            using (var db = new MySqlConnection(_dbConnection))
             {
                 db.Open();
                 return db.Query<T>(Clean(sql), parameters).FirstOrDefault();
@@ -26,7 +27,7 @@ namespace Api.DataStore
 
         public IEnumerable<T> Query<T>(string sql, object parameters)
         {
-            using (var db = new MySqlConnection(_settings.DB_Connection))
+            using (var db = new MySqlConnection(_dbConnection))
             {
                 db.Open();
                 return db.Query<T>(Clean(sql), parameters);
@@ -35,7 +36,7 @@ namespace Api.DataStore
 
         public int Execute(string sql, object parameters)
         {
-            using (var db = new MySqlConnection(_settings.DB_Connection))
+            using (var db = new MySqlConnection(_dbConnection))
             {
                 db.Open();
                 return db.Execute(Clean(sql), parameters);

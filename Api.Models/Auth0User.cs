@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Api.Models
+namespace Models
 {
     public class Auth0User
     {
@@ -17,13 +17,5 @@ namespace Api.Models
         public Auth0Identities[] identities { get; set; }
         public DateTime created_at { get; set; }
         public string sub { get; set; }
-    }
-
-    public class Auth0Identities
-    {
-        public string user_id { get; set; }
-        public string provider { get; set; }
-        public string connection { get; set; }
-        public bool isSocial { get; set; }
     }
 }
