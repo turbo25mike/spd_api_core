@@ -31,10 +31,6 @@ namespace Api.Controllers
         [Route("org")]
         public IEnumerable<Work> GetWorkAtRootForOrg() => _workDatasource.GetWorkAtRootForOrg(CurrentMemberID);
 
-        [Authorize]
-        [HttpGet]
-        [Route("{id}/tickets/open")]
-        public IEnumerable<Ticket> GetTickets(int id) => _workDatasource.GetTickets(id, CurrentMemberID);
 
         [Authorize]
         [HttpPut]

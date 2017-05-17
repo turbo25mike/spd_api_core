@@ -10,7 +10,7 @@ namespace Api.Controllers
     {
         private readonly IMemberDatasource _memberDatasource;
 
-        public MemberController(IMemberDatasource memberDatasource, IAppSettings settings)
+        public MemberController(IMemberDatasource memberDatasource)
         {
             _memberDatasource = memberDatasource;
         }

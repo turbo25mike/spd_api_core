@@ -23,7 +23,7 @@ namespace Api.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("{id}/tickets/open")]
+        [Route("{id}/ticket/open")]
         public IEnumerable<Ticket> GetTickets(int id) => _orgDatasource.GetTickets(id, CurrentMemberID);
 
         [Authorize]

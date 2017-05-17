@@ -17,6 +17,7 @@ namespace Business
         IEnumerable<WorkTag> GetTags(int id, int memberID);
         IEnumerable<Member> GetMembers(int id, int memberID);
         IEnumerable<Ticket> GetTickets(int id, int memberID);
+        IEnumerable<TicketChat> GetTicketChat(int ticketID, int workID, int memberID);
 
         int Insert(Work work, int memberID);
         void InsertChat(int workID, string newMessage, int memberID);
@@ -80,8 +81,15 @@ namespace Business
         public IEnumerable<Ticket> GetTickets(int id, int memberID)
         {
             if (!IsMember(id, memberID)) return null;
-            var script = @"SELECT * FROM Ticket WHERE WorkID = @id AND RemovedBy IS NULL AND Resolved = false;";
+            var script = @"SELECT * FROM ticket WHERE WorkID = @id AND RemovedBy IS NULL AND Resolved = false;";
             return DB.Query<Ticket>(script, new { id });
+        }
+
+        public IEnumerable<TicketChat> GetTicketChat(int ticketID, int workID, int memberID)
+        {
+            if (!IsMember(workID, memberID)) return null;
+            var script = @"SELECT * FROM `spd`.`ticket_chat` WHERE TicketID = @ticketID;";
+            return DB.Query<TicketChat>(script, new { ticketID });
         }
 
 
