@@ -9,21 +9,21 @@ namespace Api.Controllers
     [Route("api/work/{id}/ticket")]
     public class WorkTicketController: BaseController
     {
-        private readonly IWorkDatasource _workDatasource;
+        private readonly ITicketDatasource _ticketDatasource;
 
-        public WorkTicketController(IWorkDatasource workDatasource)
+        public WorkTicketController(ITicketDatasource ticketDatasource)
         {
-            _workDatasource = workDatasource;
+            _ticketDatasource = ticketDatasource;
         }
         
         [Authorize]
         [HttpGet]
         [Route("open")]
-        public IEnumerable<Ticket> GetOpenTickets(int id) => _workDatasource.GetTickets(id, CurrentMemberID);
+        public IEnumerable<Ticket> GetOpenTickets(int id) => _ticketDatasource.GetTickets(id, CurrentMemberID);
 
         [Authorize]
         [HttpGet]
         [Route("{ticketID}/chat")]
-        public IEnumerable<TicketChat> GetTicketChat(int id, int ticketID) => _workDatasource.GetTicketChat(ticketID, id, CurrentMemberID);
+        public IEnumerable<TicketChat> GetTicketChat(int id, int ticketID) => _ticketDatasource.GetTicketChat(ticketID, id, CurrentMemberID);
     }
 }

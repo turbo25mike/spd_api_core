@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Models;
 using Business.DataStore;
@@ -8,28 +7,19 @@ namespace Business
 {
     public interface IWorkDatasource
     {
-        bool IsMember(int id, int memberID);
-
-        IEnumerable<WorkChat> GetChat(int id, int memberID);
         IEnumerable<Work> GetWorkAtRootForMember(int memberID);
         IEnumerable<Work> GetWorkAtRootForOrg(int memberID);
         Work GetWorkDetails(int id, int memberID);
-        IEnumerable<WorkTag> GetTags(int id, int memberID);
         IEnumerable<Member> GetMembers(int id, int memberID);
-        IEnumerable<Ticket> GetTickets(int id, int memberID);
-        IEnumerable<TicketChat> GetTicketChat(int ticketID, int workID, int memberID);
 
         int Insert(Work work, int memberID);
-        void InsertChat(int workID, string newMessage, int memberID);
-        int InsertTag(WorkTag tag, int memberID);
 
         void Update(Work newItem, int memberID);
-        void UpdateTag(WorkTag tag, int memberID);
 
         void Delete(int id, int memberID);
     }
 
-    public class WorkDatasource : Datasource, IWorkDatasource
+    public class WorkDatasource : WorkBase, IWorkDatasource
     {
         public WorkDatasource(IDatabase db) : base(db) { }
         
@@ -69,117 +59,6 @@ namespace Business
               Where wm.WorkID = @id AND wm.RemovedDate IS NULL AND m.RemovedDate IS NULL";
             
             return DB.Query<Member>(script, new { id });
-        }
-
-        public IEnumerable<WorkChat> GetChat(int id, int memberID)
-        {
-            if (!IsMember(id, memberID)) return null;
-            var script = @"SELECT * FROM `spd`.`work_chat` WHERE WorkID = @id;";
-            return DB.Query<WorkChat>(script, new { id });
-        }
-
-        public IEnumerable<Ticket> GetTickets(int id, int memberID)
-        {
-            if (!IsMember(id, memberID)) return null;
-            var script = @"SELECT * FROM ticket WHERE WorkID = @id AND RemovedBy IS NULL AND Resolved = false;";
-            return DB.Query<Ticket>(script, new { id });
-        }
-
-        public IEnumerable<TicketChat> GetTicketChat(int ticketID, int workID, int memberID)
-        {
-            if (!IsMember(workID, memberID)) return null;
-            var script = @"SELECT * FROM `spd`.`ticket_chat` WHERE TicketID = @ticketID;";
-            return DB.Query<TicketChat>(script, new { ticketID });
-        }
-
-
-        public void InsertChat(int workID, string newMessage, int memberID)
-        {
-            if (!IsMember(workID, memberID))
-                throw new ArgumentOutOfRangeException();
-
-            var script = @"INSERT INTO `spd`.`work_chat`
-            (
-                `WorkID`,`Message`,
-                `CompleteDate`,`CreatedBy`,`CreatedDate`,`UpdatedBy`,`UpdatedDate`
-            )
-            VALUES
-            (
-                @WorkID,@Message,
-                @CreatedBy,NOW(),@UpdatedBy,NOW()
-            );
-            SELECT LAST_INSERT_ID();";
-
-            var newItem = new WorkChat()
-            {
-                CreatedBy = memberID,
-                UpdatedBy = memberID,
-                Message = newMessage,
-                WorkID = workID
-            };
-            DB.Execute(script, newItem);
-        }
-
-        public IEnumerable<WorkTag> GetTags(int id, int memberID)
-        {
-            if (!IsMember(id, memberID))
-                return null;
-            var script = @"SELECT * FROM work_tag 
-            WHERE WorkID = @id AND RemovedDate IS NULL";
-            return DB.Query<WorkTag>(script, new { id });
-        }
-
-        public int InsertTag(WorkTag tag, int memberID)
-        {
-            if (tag == null)
-                throw new ArgumentNullException(nameof(tag));
-
-            if (!IsMember(tag.WorkID, memberID))
-                throw new ArgumentOutOfRangeException();
-
-            tag.CreatedBy = memberID;
-            tag.UpdatedBy = memberID;
-
-            var script = @"INSERT INTO work_tag
-                ( WorkID,Title,`Value`,Color,CreatedBy,CreatedDate,UpdatedBy,UpdatedDate )
-                VALUES
-                ( @WorkID, @Title, @Value, @Color, @CreatedBy, NOW(), @UpdatedBy, NOW() );
-                SELECT LAST_INSERT_ID();";
-            return DB.QuerySingle<int>(script, tag);
-        }
-
-        public void UpdateTag(WorkTag tag, int memberID)
-        {
-            if (!IsMember(tag.WorkID, memberID))
-                throw new ArgumentOutOfRangeException();
-            if (tag == null)
-                throw new ArgumentNullException(nameof(tag));
-
-            var scriptGet = @"SELECT * FROM work_tag WHERE WorkTagID = @WorkTagID AND RemovedDate IS NULL";
-
-            if (DB.QuerySingle<WorkTag>(scriptGet, tag) == null)
-                throw new ArgumentOutOfRangeException();
-
-            var script = @"UPDATE work_tag
-            SET
-            `Title` = @Title,
-            `Value` = @Value,
-            `Color` = @Color,
-            `UpdatedBy` = @UpdatedBy,
-            `UpdatedDate` = NOW()
-            WHERE `WorkTagID` = @WorkTagID;";
-
-            tag.UpdatedBy = memberID;
-            DB.Execute(script, tag);
-        }
-
-        public bool IsMember(int id, int memberID)
-        {
-            var script = @"SELECT MemberID FROM work_member
-              Where WorkID = @id AND MemberID = @memberID AND RemovedDate IS NULL";
-
-            var isMember = DB.QuerySingle<WorkMember>(script, new { id, memberID });
-            return isMember != null;
         }
 
         public int Insert(Work work, int memberID)

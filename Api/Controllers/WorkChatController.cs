@@ -9,21 +9,21 @@ namespace Api.Controllers
     [Route("api/work/{id}/chat")]
     public class WorkChatController : BaseController
     {
-        private readonly IWorkDatasource _workDatasource;
+        private readonly IWorkChatDatasource _workChatDatasource;
 
-        public WorkChatController(IWorkDatasource workDatasource)
+        public WorkChatController(IWorkChatDatasource workChatDatasource)
         {
-            _workDatasource = workDatasource;
+            _workChatDatasource = workChatDatasource;
         }
 
         [Authorize]
         [HttpGet]
         [Route("")]
-        public IEnumerable<WorkChat> GetWorkChat(int id) => _workDatasource.GetChat(id, CurrentMemberID);
+        public IEnumerable<WorkChat> Get(int id) => _workChatDatasource.Get(id, CurrentMemberID);
 
         [Authorize]
         [HttpPut]
         [Route("")]
-        public void Put(int id, [FromBody] string newMessage) => _workDatasource.InsertChat(id, newMessage, CurrentMemberID);
+        public void Put(int id, [FromBody] string newMessage) => _workChatDatasource.Insert(id, newMessage, CurrentMemberID);
     }
 }

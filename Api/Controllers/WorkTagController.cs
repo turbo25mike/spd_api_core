@@ -9,26 +9,26 @@ namespace Api.Controllers
     [Route("api/work/{id}/tag")]
     public class WorkTagController : BaseController
     {
-        private readonly IWorkDatasource _workDatasource;
+        private readonly IWorkTagDatasource _workTagDatasource;
 
-        public WorkTagController(IWorkDatasource workDatasource)
+        public WorkTagController(IWorkTagDatasource workTagDatasource)
         {
-            _workDatasource = workDatasource;
+            _workTagDatasource = workTagDatasource;
         }
 
         [Authorize]
         [HttpGet]
         [Route("")]
-        public IEnumerable<WorkTag> Get(int id) => _workDatasource.GetTags(id, CurrentMemberID);
+        public IEnumerable<WorkTag> Get(int id) => _workTagDatasource.Get(id, CurrentMemberID);
 
         [Authorize]
         [HttpPut]
         [Route("")]
-        public void Put([FromBody] WorkTag tag) => _workDatasource.UpdateTag(tag, CurrentMemberID);
+        public void Put([FromBody] WorkTag tag) => _workTagDatasource.Update(tag, CurrentMemberID);
 
         [Authorize]
         [HttpPost]
         [Route("")]
-        public int Post([FromBody] WorkTag tag) => _workDatasource.InsertTag(tag, CurrentMemberID);
+        public int Post([FromBody] WorkTag tag) => _workTagDatasource.Insert(tag, CurrentMemberID);
     }
 }

@@ -62,8 +62,12 @@ namespace Api
 
             services.AddTransient<IDatabase, MySqlDatabase>();
             services.AddTransient<IWorkDatasource, WorkDatasource>();
+            services.AddTransient<IWorkChatDatasource, WorkChatDatasource>();
+            services.AddTransient<IWorkTagDatasource, WorkTagDatasource>();
             services.AddTransient<IMemberDatasource, MemberDatasource>();
             services.AddTransient<IOrgDatasource, OrgDatasource>();
+            services.AddTransient<ITicketDatasource, TicketDatasource>();
+            
         }
 
 
