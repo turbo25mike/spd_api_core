@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Models;
 using Business.DataStore;
 
@@ -8,35 +9,62 @@ namespace Business
     {
         bool IsMember(int id, int memberID);
         
-        IEnumerable<Ticket> GetTickets(int id, int memberID);
+        IEnumerable<Ticket> GetTicketsByWorkID(int id, int memberID);
         IEnumerable<TicketChat> GetTicketChat(int ticketID, int workID, int memberID);
     }
 
-    public class TicketDatasource : Datasource, ITicketDatasource
+    public class TicketDatasource : WorkBase, ITicketDatasource
     {
         public TicketDatasource(IDatabase db) : base(db) { }
-        
-        public IEnumerable<Ticket> GetTickets(int id, int memberID)
+
+        public IEnumerable<Ticket> GetTickets(int memberID)
         {
-            if (!IsMember(id, memberID)) return null;
-            var script = @"SELECT * FROM ticket WHERE WorkID = @id AND RemovedBy IS NULL AND Resolved = false;";
-            return DB.Query<Ticket>(script, new { id });
+            var script = @"SELECT * FROM ticket WHERE CreatedBy = @memberID AND RemovedBy IS NULL;";
+            return DB.Query<Ticket>(script, new { memberID });
+        }
+
+        public IEnumerable<Ticket> GetTicketsByWorkID(int workID, int memberID)
+        {
+            if (!IsMember(workID, memberID)) return null;
+            var script = $@"SELECT * FROM ticket WHERE WorkID = @{nameof(workID)} AND RemovedBy IS NULL AND Resolved = false;";
+            return DB.Query<Ticket>(script, new { workID });
         }
 
         public IEnumerable<TicketChat> GetTicketChat(int ticketID, int workID, int memberID)
         {
-            if (!IsMember(workID, memberID)) return null;
-            var script = @"SELECT * FROM `spd`.`ticket_chat` WHERE TicketID = @ticketID;";
+            if (GetTicket(ticketID, memberID) == null)
+                return null;
+
+            var script = $@"SELECT * FROM `spd`.`ticket_chat` WHERE TicketID = @{nameof(ticketID)} AND RemovedBy IS NULL;";
             return DB.Query<TicketChat>(script, new { ticketID });
         }
 
-        public bool IsMember(int id, int memberID)
+        public void Insert(int ticketID, string newMessage, int memberID)
         {
-            var script = @"SELECT MemberID FROM work_member
-              Where WorkID = @id AND MemberID = @memberID AND RemovedDate IS NULL";
+            if (GetTicket(ticketID, memberID) == null)
+                throw new ArgumentOutOfRangeException();
 
-            var isMember = DB.QuerySingle<WorkMember>(script, new { id, memberID });
-            return isMember != null;
+            var script = $@"INSERT INTO `spd`.`ticket_chat`
+            (
+                `TicketID`,`Message`,
+                `CompleteDate`,`CreatedBy`,`CreatedDate`,`UpdatedBy`,`UpdatedDate`
+            )
+            VALUES
+            (
+                @{nameof(ticketID)},@{nameof(newMessage)},
+                @{nameof(memberID)},NOW(),@{nameof(memberID)},NOW()
+            );
+            SELECT LAST_INSERT_ID();";
+
+            DB.Execute(script, new {ticketID, newMessage, memberID });
+        }
+
+        public Ticket GetTicket(int ticketID, int memberID)
+        {
+            var ticketScript = $@"SELECT * FROM ticket WHERE TicketID = @{ticketID} AND RemovedBy IS NULL;";
+            var ticket = DB.QuerySingle<Ticket>(ticketScript, new { ticketID });
+
+            return ticket == null || !IsMember(ticket.WorkID, memberID) && ticket.CreatedBy != memberID ? null : ticket;
         }
     }
 }
