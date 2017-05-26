@@ -19,7 +19,7 @@ namespace Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("open")]
-        public IEnumerable<Ticket> GetOpenTickets(int id) => _ticketDatasource.GetTickets(id, CurrentMemberID);
+        public IEnumerable<Ticket> GetOpenTickets(int id) => _ticketDatasource.GetTicketsByWorkID(id, CurrentMemberID);
 
         [Authorize]
         [HttpGet]

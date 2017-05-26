@@ -11,6 +11,9 @@ namespace Business
         
         IEnumerable<Ticket> GetTicketsByWorkID(int id, int memberID);
         IEnumerable<TicketChat> GetTicketChat(int ticketID, int workID, int memberID);
+        IEnumerable<Ticket> GetTickets(int memberID);
+        void Insert(int ticketID, string newMessage, int memberID);
+        Ticket GetTicket(int ticketID, int memberID);
     }
 
     public class TicketDatasource : WorkBase, ITicketDatasource
@@ -61,7 +64,7 @@ namespace Business
 
         public Ticket GetTicket(int ticketID, int memberID)
         {
-            var ticketScript = $@"SELECT * FROM ticket WHERE TicketID = @{ticketID} AND RemovedBy IS NULL;";
+            var ticketScript = $@"SELECT * FROM ticket WHERE TicketID = @{nameof(ticketID)} AND RemovedBy IS NULL;";
             var ticket = DB.QuerySingle<Ticket>(ticketScript, new { ticketID });
 
             return ticket == null || !IsMember(ticket.WorkID, memberID) && ticket.CreatedBy != memberID ? null : ticket;
