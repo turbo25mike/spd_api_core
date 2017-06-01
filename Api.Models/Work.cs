@@ -21,6 +21,7 @@ namespace Models
         public int? Size { get; set; }
         public int? Priority { get; set; }
         public double? HoursWorked { get; set; }
+        public bool? IsPublic { get; set; }
         public DateTime? DueDate { get; set; }
         public DateTime? CompleteDate { get; set; }
 
